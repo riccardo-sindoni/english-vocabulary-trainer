@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Il mio vocabolario inglese</title>
+<style>
+  :root {
+    --bg: #f5f6fa; --card: #ffffff; --text: #1b2232; --muted: #5a6375; --border: #dce0e8;
+    --primary: #2f54d6; --primary-hover: #2443b3; --primary-text: #ffffff;
+    --ok: #17773f; --ok-bg: #e2f5e9; --err: #b92525; --err-bg: #fde6e6;
+    --warn: #7a5800; --warn-bg: #fff3c4; --mark: #ffe58a; --shadow: 0 1px 3px rgba(20,30,60,.08);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --card: #1c212c; --text: #e8ebf2; --muted: #a2aabb; --border: #313848;
+      --primary: #6f8cff; --primary-hover: #8aa1ff; --primary-text: #0d1020;
+      --ok: #6fdc98; --ok-bg: #173323; --err: #ff8c8c; --err-bg: #3a1c1c;
+      --warn: #ffd666; --warn-bg: #3a3014; --mark: #6b5a12; --shadow: none;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 0; }
+  h1 { font-size: 1.15rem; margin: 0; }
+  nav { display: flex; gap: 4px; }
+  nav button { background: none; border: none; color: var(--muted); font: inherit; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+  nav button[aria-selected="true"] { background: var(--primary); color: var(--primary-text); }
+  nav button:hover:not([aria-selected="true"]) { background: var(--bg); color: var(--text); }
+  main { padding: 20px 0 48px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 1.1rem; }
+  .card h3 { margin: 0 0 8px; font-size: 1rem; }
+  label { display: block; font-weight: 600; margin: 10px 0 4px; font-size: .95rem; }
+  .req { color: var(--err); }
+  input[type=text], input[type=search], textarea {
+    width: 100%; font: inherit; color: var(--text); background: var(--bg);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  textarea { min-height: 110px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: .9rem; }
+  input:focus, textarea:focus, button:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: 1px; }
+  .hint { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .btn { font: inherit; font-weight: 600; border-radius: 8px; padding: 10px 16px; cursor: pointer;
+    border: 1px solid var(--primary); background: var(--primary); color: var(--primary-text); }
+  .btn:hover { background: var(--primary-hover); }
+  .btn.sec { background: transparent; color: var(--primary); }
+  .btn.sec:hover { background: color-mix(in srgb, var(--primary) 10%, transparent); }
+  .btn.danger { background: transparent; color: var(--err); border-color: var(--err); }
+  .btn.small { padding: 5px 10px; font-size: .85rem; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .msg { padding: 10px 12px; border-radius: 8px; margin-top: 12px; font-size: .95rem; }
+  .msg.ok { background: var(--ok-bg); color: var(--ok); }
+  .msg.err { background: var(--err-bg); color: var(--err); }
+  .msg.warn { background: var(--warn-bg); color: var(--warn); }
+  .msg.info { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--text); }
+  details summary { cursor: pointer; font-weight: 600; }
+  .list { list-style: none; padding: 0; margin: 12px 0 0; }
+  .list li { border-top: 1px solid var(--border); padding: 10px 0; display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; }
+  .list .w { font-weight: 700; }
+  .list .ex { font-style: italic; color: var(--muted); font-size: .9rem; }
+  .list .st { color: var(--muted); font-size: .8rem; }
+  .list .act { display: flex; gap: 6px; flex-shrink: 0; }
+  .badge { display: inline-block; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 1px 10px; font-size: .85rem; color: var(--muted); }
+  .grid2 { display: grid; gap: 16px; }
+  @media (min-width: 820px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+
+  /* Test */
+  .test-card { max-width: 720px; margin-left: auto; margin-right: auto; }
+  .progress { height: 8px; background: var(--bg); border-radius: 99px; overflow: hidden; border: 1px solid var(--border); }
+  .progress > div { height: 100%; background: var(--primary); transition: width .25s; }
+  .qmeta { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); margin: 8px 0 14px; }
+  .qtype { font-weight: 600; color: var(--primary); }
+  .prompt { font-size: 1.35rem; font-weight: 700; margin: 4px 0 6px; word-wrap: break-word; }
+  .sentence { font-size: 1.15rem; margin: 4px 0 6px; }
+  mark { background: var(--mark); color: inherit; padding: 0 3px; border-radius: 4px; font-weight: 700; }
+  .blank { letter-spacing: 2px; font-weight: 700; color: var(--primary); }
+  .feedback { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-weight: 600; border-left: 6px solid; }
+  .feedback.ok { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+  .feedback.err { background: var(--err-bg); color: var(--err); border-color: var(--err); }
+  .feedback.warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+  .feedback .sub { font-weight: 400; color: var(--text); margin-top: 4px; }
+  input.ok { border-color: var(--ok); } input.err { border-color: var(--err); } input.warn { border-color: var(--warn); }
+  .score { font-size: 2.2rem; font-weight: 800; margin: 4px 0; }
+
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: 7px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  .pct { font-weight: 700; }
+
+  /* Statistiche */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .kpi .v { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
+  .kpi .l { color: var(--muted); font-size: .85rem; }
+  .kpi .s { color: var(--muted); font-size: .8rem; margin-top: 2px; }
+  .charts { display: grid; gap: 16px; margin-bottom: 16px; }
+  .charts .card { margin-bottom: 0; min-width: 0; }
+  @media (min-width: 820px) { .charts { grid-template-columns: 1fr 1fr; } }
+  .sottotitolo { margin: -6px 0 8px; }
+  .grafico svg { display: block; overflow: visible; }
+  .grafico .hit { fill: transparent; cursor: default; }
+  .grafico .hit:hover, .grafico .hit.attivo { fill: var(--border); fill-opacity: .45; }
+  .grafico-vuoto { padding: 28px 0; text-align: center; }
+  #tooltip { position: fixed; z-index: 30; pointer-events: none; max-width: 260px; padding: 7px 10px; border-radius: 8px;
+    background: var(--text); color: var(--bg); font-size: .85rem; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+  .stack { display: flex; gap: 2px; height: 22px; border-radius: 6px; overflow: hidden; background: var(--bg); }
+  .stack > div { min-width: 3px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: .9rem; }
+  .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { border: 1px solid var(--border); background: var(--bg); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
+  /* Percorso: linee con obiettivi */
+  .obiettivo { margin: 12px 0; }
+  .obiettivo-testo { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; margin-bottom: 6px; flex-wrap: wrap; }
+  .traccia { display: flex; align-items: center; }
+  .traccia .seg { flex: 1; height: 3px; background: var(--border); min-width: 4px; }
+  .traccia .seg.on { background: var(--primary); }
+  .traccia .nodo { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: var(--card); }
+  .traccia .nodo.on { background: var(--primary); border-color: var(--primary); }
+  .traccia .nodo.tappa { width: 24px; height: 24px; display: grid; place-items: center; font-size: 12px; filter: grayscale(1); opacity: .45; }
+  .traccia .nodo.tappa.on { filter: none; opacity: 1; background: color-mix(in srgb, var(--primary) 18%, var(--card)); }
+  .traccia .nodo.tappa.attiva { filter: none; opacity: 1; border-color: var(--warn); box-shadow: 0 0 0 3px var(--warn-bg); animation: pulsa 1.6s ease-in-out infinite; }
+  .traccia .meta { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 19px;
+    border: 2px dashed var(--border); background: var(--card); filter: grayscale(1); opacity: .55; }
+  .traccia .meta.attiva { filter: none; opacity: 1; border: 2px solid var(--warn); background: var(--warn-bg); animation: pulsa 1.6s ease-in-out infinite; }
+  @keyframes pulsa { 50% { transform: scale(1.1); } }
+  @media (prefers-reduced-motion: reduce) { .traccia .meta.attiva, .traccia .nodo.tappa.attiva { animation: none; } }
+  .trofei { font-size: 1.2rem; letter-spacing: 2px; }
+  .prova-banner { display: flex; gap: 14px; align-items: flex-start; border-radius: 12px; padding: 14px; margin-bottom: 8px; border: 1px solid; }
+  .prova-banner h2 { margin: 0 0 4px; }
+  .prova-banner p { margin: 0; }
+  .prova-banner.esame { background: color-mix(in srgb, var(--primary) 10%, var(--card)); border-color: color-mix(in srgb, var(--primary) 40%, transparent); }
+  .prova-banner.boss { background: var(--err-bg); border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+  .prova-icona { font-size: 2.2rem; line-height: 1; }
+  .segnapunti { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: .9rem;
+    padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; background: color-mix(in srgb, var(--primary) 10%, var(--card)); }
+  .segnapunti.boss { background: var(--err-bg); }
+
+  /* Certificati */
+  .certs { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 12px 8px; margin-top: 10px; }
+  .cert { text-align: center; }
+  .cert .medaglia { width: 54px; height: 54px; margin: 0 auto; border-radius: 50%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; line-height: 1.05; border: 2px dashed var(--border); background: var(--bg); color: var(--muted); }
+  .cert .num { font-weight: 800; font-size: 1rem; }
+  .cert .ico { font-size: .72rem; }
+  .cert .cap { font-size: .72rem; color: var(--muted); margin-top: 3px; }
+  .cert:not(.ottenuto) { opacity: .6; }
+  .cert.ottenuto .medaglia { border: 2px solid rgba(255,255,255,.55); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    box-shadow: 0 2px 6px rgba(0,0,0,.18), inset 0 -3px 0 rgba(0,0,0,.15); }
+  .cert.ottenuto.bronzo .medaglia { background: radial-gradient(circle at 35% 30%, #e7a774, #a8612e); }
+  .cert.ottenuto.argento .medaglia { background: radial-gradient(circle at 35% 30%, #dfe4ea, #7c8794); }
+  .cert.ottenuto.oro .medaglia { background: radial-gradient(circle at 35% 30%, #ffe27a, #c08a00); }
+  .cert.ottenuto.diamante .medaglia { background: radial-gradient(circle at 35% 30%, #b9f1ff, #2b8fb8); }
+  .cert.ottenuto .cap { color: var(--text); font-weight: 600; }
+  .nuovo-cert { display: flex; gap: 12px; align-items: center; padding: 10px 12px; margin-top: 10px; border-radius: 10px; background: var(--warn-bg); color: var(--text); }
+  .nuovo-cert .cert { flex: none; }
+
+  /* Studio */
+  @media (max-width: 440px) { nav button { padding: 8px 9px; } }
+  select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; }
+  .studio-controlli { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .studio-controlli input[type=search] { flex: 1 1 180px; width: auto; }
+  .check { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-weight: 600; font-size: .9rem; cursor: pointer; }
+  .check input { width: 18px; height: 18px; }
+  #studio-info { margin-top: 10px; }
+  .seg-ctrl { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg-ctrl button { font: inherit; font-weight: 600; font-size: .9rem; border: 0; padding: 8px 12px; background: var(--bg); color: var(--muted); cursor: pointer; }
+  .seg-ctrl button[aria-pressed="true"] { background: var(--primary); color: var(--primary-text); }
+  .studio-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .sc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .sc-img { display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; padding: 0; background: var(--bg); cursor: pointer; }
+  .sc-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sc-img.vuota { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 1.6rem;
+    color: var(--muted); border-bottom: 1px dashed var(--border); aspect-ratio: 4 / 1.6; }
+  .sc-img.vuota span { font-size: .8rem; font-weight: 600; }
+  .sc-img.vuota:hover { color: var(--primary); }
+  .sc-body { padding: 12px 14px 14px; }
+  .sc-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .sc-en { font-size: 1.3rem; font-weight: 800; margin-top: 6px; line-height: 1.25; word-wrap: break-word; }
+  .sc-it { font-size: 1.05rem; color: var(--primary); font-weight: 600; margin-top: 2px; }
+  .sc-it.velata { filter: blur(6px); cursor: pointer; user-select: none; }
+  .sc-ex { font-style: italic; color: var(--muted); font-size: .92rem; margin-top: 8px; }
+  .sc-st { color: var(--muted); font-size: .78rem; margin-top: 8px; }
+  .stato-chip { font-size: .75rem; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+    background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--text); border: 1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+  .icon-btn { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 3px 8px; cursor: pointer; font-size: 1rem; }
+  .flash-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .flash-top .btn { margin-left: auto; }
+  .flash { max-width: 520px; margin: 0 auto; min-height: 280px; background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(20,30,60,.10); padding: 22px; text-align: center; cursor: pointer; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+  .flash.girata { border-color: var(--primary); }
+  .flash img { max-height: 220px; max-width: 100%; margin: 0 auto 6px; border-radius: 10px; object-fit: contain; }
+  .fl-en { font-size: 2rem; font-weight: 800; line-height: 1.2; word-wrap: break-word; }
+  .fl-it { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+  .fl-ex { font-style: italic; color: var(--muted); }
+  .fl-retro { border-top: 1px dashed var(--border); padding-top: 12px; margin-top: 6px; min-height: 2.4em; }
+  .flash-nav { justify-content: center; }
+  .studio-flash-wrap { max-width: 640px; margin: 0 auto; }
+  .mini-img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; flex: none; }
+  .list .li-testo { flex: 1; min-width: 0; }
+  .fb-img { display: block; max-width: 160px; max-height: 120px; border-radius: 8px; margin-top: 8px; object-fit: cover; }
+  dialog#dlg-img { border: 1px solid var(--border); border-radius: 14px; padding: 0; background: var(--card); color: var(--text);
+    width: min(520px, calc(100vw - 32px)); box-shadow: 0 10px 40px rgba(0,0,0,.3); }
+  dialog#dlg-img::backdrop { background: rgba(10,14,24,.55); }
+  .dlg { padding: 18px; }
+  .dlg h2 { margin: 0 0 12px; font-size: 1.1rem; }
+  .dlg-drop { border: 2px dashed var(--border); border-radius: 12px; min-height: 170px; display: grid; place-items: center; background: var(--bg); padding: 8px; }
+  .dlg-drop.sopra { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg)); }
+  .dlg-drop img { max-width: 100%; max-height: 240px; border-radius: 8px; }
+  .dlg-vuoto { text-align: center; color: var(--muted); }
+  .dlg-fine { justify-content: space-between; }
+  kbd { font: .8em ui-monospace, Consolas, monospace; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--bg); }
+
+  :root { --c-nuova: #9aa3b5; --c-sicura: var(--ok); --c-recuperata: var(--primary); --c-ripassare: var(--err); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap topbar">
+    <h1>📘 Il mio vocabolario inglese</h1>
+    <nav role="tablist" aria-label="Sezioni">
+      <button role="tab" id="tab-aggiungi" aria-controls="sez-aggiungi" aria-selected="true">Aggiungi</button>
+      <button role="tab" id="tab-studio" aria-controls="sez-studio" aria-selected="false">Studio</button>
+      <button role="tab" id="tab-test" aria-controls="sez-test" aria-selected="false">Test</button>
+      <button role="tab" id="tab-classifica" aria-controls="sez-classifica" aria-selected="false">Classifica</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- ================= AGGIUNGI ================= -->
+  <section id="sez-aggiungi" role="tabpanel" aria-labelledby="tab-aggiungi">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2 id="form-titolo">Nuova parola</h2>
+          <form id="form-parola" autocomplete="off" novalidate>
+            <input type="hidden" id="f-id">
+            <label for="f-inglese">Parola o espressione in inglese <span class="req">*</span></label>
+            <input type="text" id="f-inglese" required autocapitalize="off" spellcheck="false" placeholder="es. give up">
+            <label for="f-italiano">Traduzione italiana <span class="req">*</span></label>
+            <input type="text" id="f-italiano" required placeholder="es. arrendersi, rinunciare">
+            <div class="hint">Più traduzioni? Separale con una virgola: tutte saranno accettate nei test.</div>
+            <label for="f-esempio">Frase d'esempio in inglese <span class="hint">(consigliata)</span></label>
+            <input type="text" id="f-esempio" placeholder="es. Don't give up on your dreams.">
+            <div class="hint" id="hint-esempio">💡 Senza frase d'esempio questa parola non potrà comparire nei test a frase (traduzione nel contesto e completamento).</div>
+            <div class="row">
+              <button type="submit" class="btn" id="f-salva">Aggiungi parola</button>
+              <button type="button" class="btn sec" id="f-annulla" hidden>Annulla modifica</button>
+            </div>
+            <div id="form-msg" role="status" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <details>
+            <summary>Inserimento rapido multiplo</summary>
+            <label for="bulk">Una parola per riga, nel formato <code>inglese ; italiano ; frase (opzionale)</code></label>
+            <textarea id="bulk" placeholder="look forward to ; non vedere l'ora di ; I look forward to seeing you.&#10;steady ; stabile, costante"></textarea>
+            <div class="row"><button class="btn" id="bulk-btn" type="button">Aggiungi tutte</button></div>
+            <div id="bulk-msg" role="status" aria-live="polite"></div>
+          </details>
+        </div>
+
+        <div class="card">
+          <h2>Backup</h2>
+          <p class="hint" style="margin-top:0">I dati restano solo in questo browser. Esporta un backup ogni tanto: se cancelli la cache non li perdi.</p>
+          <div class="row">
+            <button class="btn sec" id="export-btn" type="button">⬇ Esporta backup (JSON)</button>
+            <button class="btn sec" id="import-btn" type="button">⬆ Importa backup (JSON)</button>
+            <input type="file" id="import-file" accept=".json,application/json" hidden>
+          </div>
+          <div id="backup-msg" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Le mie parole <span class="badge" id="contatore">0</span></h2>
+        <label for="cerca" class="sr-only">Cerca</label>
+        <input type="search" id="cerca" placeholder="🔍 Cerca in inglese o italiano…">
+        <ul class="list" id="lista"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STUDIO ================= -->
+  <section id="sez-studio" role="tabpanel" aria-labelledby="tab-studio" hidden>
+    <div class="card" id="studio-bloccato" hidden>
+      <h2>🔒 Test in corso</h2>
+      <p>La pagina di studio si sblocca alla fine del test, così non puoi sbirciare le risposte.</p>
+      <div class="row"><button class="btn" id="studio-torna-test" type="button">Torna al test</button></div>
+    </div>
+
+    <div id="studio-contenuto">
+      <div class="card">
+        <div class="studio-controlli">
+          <div class="seg-ctrl" role="group" aria-label="Modalità di studio">
+            <button type="button" data-modo="elenco" aria-pressed="true">📋 Schede</button>
+            <button type="button" data-modo="flash" aria-pressed="false">🃏 Flashcard</button>
+          </div>
+          <label class="sr-only" for="studio-cerca">Cerca</label>
+          <input type="search" id="studio-cerca" placeholder="🔍 Cerca…">
+          <label class="sr-only" for="studio-filtro">Filtro</label>
+          <select id="studio-filtro">
+            <option value="tutte">Tutte le parole</option>
+            <option value="daRipassare">Da ripassare</option>
+            <option value="nuova">Nuove (mai uscite)</option>
+            <option value="recuperata">Recuperate</option>
+            <option value="sicura">Sempre giuste</option>
+            <option value="senzaImmagine">Senza immagine</option>
+          </select>
+          <label class="sr-only" for="studio-ordine">Ordine</label>
+          <select id="studio-ordine">
+            <option value="alfa">A → Z</option>
+            <option value="errori">Più sbagliate prima</option>
+            <option value="recenti">Aggiunte di recente</option>
+          </select>
+          <label class="check" id="studio-nascondi-wrap"><input type="checkbox" id="studio-nascondi"> Nascondi traduzioni</label>
+          <label class="sr-only" for="studio-fronte">Fronte della carta</label>
+          <select id="studio-fronte" hidden>
+            <option value="en">Fronte: inglese</option>
+            <option value="it">Fronte: italiano</option>
+          </select>
+        </div>
+        <div class="hint" id="studio-info"></div>
+      </div>
+      <div id="studio-elenco" class="studio-grid"></div>
+      <div id="studio-flash" hidden></div>
+    </div>
+  </section>
+
+  <!-- ================= TEST ================= -->
+  <section id="sez-test" role="tabpanel" aria-labelledby="tab-test" hidden>
+    <div class="card test-card" id="test-area" aria-live="polite"></div>
+  </section>
+
+  <!-- ================= CLASSIFICA E STATISTICHE ================= -->
+  <section id="sez-classifica" role="tabpanel" aria-labelledby="tab-classifica" hidden>
+    <div class="card" id="classifica-bloccata" hidden>
+      <h2>🔒 Test in corso</h2>
+      <p>Classifica e statistiche si sbloccano alla fine del test, così non puoi sbirciare le risposte.</p>
+      <div class="row"><button class="btn" id="torna-test" type="button">Torna al test</button></div>
+    </div>
+
+    <div id="classifica-contenuto">
+      <div class="kpis" id="kpi"></div>
+
+      <div class="card">
+        <h2 id="percorso-titolo">Il tuo percorso</h2>
+        <div id="percorso"></div>
+      </div>
+
+      <div class="card">
+        <h2>Certificati</h2>
+        <div id="certificati"></div>
+      </div>
+
+      <div class="card">
+        <h3>Stato del vocabolario</h3>
+        <div id="ch-stato"></div>
+      </div>
+
+      <div class="charts">
+        <div class="card">
+          <h3>Errori in ogni test</h3>
+          <p class="hint sottotitolo">Ultimi 30 test · più basso è meglio</p>
+          <div class="grafico" id="ch-errori"></div>
+        </div>
+        <div class="card">
+          <h3>Test fatti ogni giorno</h3>
+          <p class="hint sottotitolo">Ultimi 30 giorni</p>
+          <div class="grafico" id="ch-test"></div>
+        </div>
+        <div class="card">
+          <h3>Parole aggiunte ogni giorno</h3>
+          <p class="hint sottotitolo">Ultimi 30 giorni</p>
+          <div class="grafico" id="ch-aggiunte"></div>
+        </div>
+        <div class="card">
+          <h3>Parole recuperate</h3>
+          <p class="hint sottotitolo" id="sottotitolo-recuperate"></p>
+          <div class="grafico" id="ch-recuperate"></div>
+          <div id="lista-recuperate"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Classifica errori</h2>
+        <div id="classifica-completa"></div>
+        <div class="row">
+          <button class="btn sec" id="mostra-tutte" type="button" hidden>Mostra tutte</button>
+          <button class="btn danger" id="azzera" type="button">Azzera statistiche</button>
+        </div>
+        <div id="classifica-msg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+  <div id="tooltip" role="tooltip" hidden></div>
+
+  <!-- Finestra per aggiungere/cambiare l'immagine di una parola -->
+  <dialog id="dlg-img" aria-labelledby="dlg-titolo">
+    <form method="dialog" class="dlg">
+      <h2 id="dlg-titolo">Immagine</h2>
+      <div class="dlg-drop" id="dlg-drop" tabindex="0" aria-label="Zona immagine: incolla, trascina o carica"></div>
+      <div class="row">
+        <a class="btn sec" id="dlg-cerca" target="_blank" rel="noopener noreferrer">🔍 Cerca su Google Immagini</a>
+        <button type="button" class="btn sec" id="dlg-carica">📁 Carica dal dispositivo</button>
+        <input type="file" id="dlg-file" accept="image/*" hidden>
+      </div>
+      <p class="hint">Su Google: clic destro sull'immagine → <b>Copia immagine</b>, poi torna qui e premi <kbd>Ctrl</kbd>+<kbd>V</kbd>.
+        Puoi anche trascinare qui un'immagine dal computer. Dal telefono: salva l'immagine e usa "Carica dal dispositivo".</p>
+      <div id="dlg-msg" role="status" aria-live="polite"></div>
+      <div class="row dlg-fine">
+        <button type="button" class="btn danger" id="dlg-rimuovi">Rimuovi immagine</button>
+        <button type="submit" class="btn" value="ok">Fatto</button>
+      </div>
+    </form>
+  </dialog>
+</main>
+
+<!-- =====================================================================
+     LOGICA PURA (nessun accesso al DOM né a localStorage: testabile a parte)
+     ===================================================================== -->
+<script id="logica">
+'use strict';
+
+/* ---- PARAMETRI DELL'ALGORITMO: modificali qui ---- */
+const CONFIG = {
+  DOMANDE_PER_TEST: 10,      // domande per test
+
+  // Ogni test è diviso in 3 "corsie" (vedi scegliParole):
+  POSTI_NUOVE: 3,            // 1) posti riservati alle parole mai uscite, dalla più vecchia
+  POSTI_ROTAZIONE: 3,        // 2) posti riservati alle parole già viste che non escono da più tempo
+  CANDIDATI_PER_POSTO: 2,    //    in 1) e 2) si sceglie a caso tra le prime (posti × questo) in coda
+                             // 3) i posti restanti: estrazione pesata tra le parole "da ripassare"
+  GIUSTE_PER_USCIRE: 2,      //    una parola sbagliata resta "da ripassare" finché non la indovini
+                             //    tante volte di fila quanto questo valore
+
+  MOLTIPLICATORE_ERRORI: 2,  // ogni errore aggiunge questo valore al peso
+  SMORZAMENTO_ERRORI: 2,     // ogni risposta giusta consecutiva divide per questo il peso degli errori
+  BONUS_NUOVA: 2,            // bonus se la parola non è mai stata mostrata
+  BONUS_NON_VISTA: 1,        // bonus se non compare in un test da più di GIORNI_NON_VISTA giorni
+  GIORNI_NON_VISTA: 7,
+  PESO_MIN: 1,               // ogni parola ha sempre almeno questa probabilità relativa
+  PESO_MAX: 12,              // tetto: le parole molto sbagliate non monopolizzano il test
+  LUNGHEZZA_MIN_REFUSO: 4,   // sotto questa lunghezza non si accettano errori di battitura
+
+  // ---- Percorso a livelli ----
+  // Ritmo: 10 test -> miniboss, 10 test -> miniboss, … (MINIBOSS_PER_BOSS volte),
+  //        10 test -> BOSS, poi si ricomincia al livello successivo.
+  TEST_PER_ESAME: 10,        // test normali prima di ogni traguardo (miniboss o boss)
+  DOMANDE_ESAME: 30,         // domande del miniboss
+  SOGLIA_ESAME: 0.6,         // risposte giuste richieste (0.6 × 30 = 18)
+  MINIBOSS_PER_BOSS: 9,      // miniboss da superare nel livello: il traguardo dopo il 9° è il boss
+                             // (cioè il boss è il 10° traguardo; metti 10 per avere 10 miniboss + boss)
+  DOMANDE_BOSS: 100,
+  SOGLIA_BOSS: 0.6,          // 0.6 × 100 = 60
+  DOMANDE_RIPASSO_MAX: 30,   // "Ripeti solo gli errori" usa al massimo queste parole
+
+  // ---- Certificati ----
+  TRAGUARDI: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000],
+                                                             // test completati / test senza errori
+  TRAGUARDI_MINIBOSS: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],  // miniboss superati
+  TRAGUARDI_BOSS: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]         // boss sconfitti
+};
+const GIORNO_MS = 24 * 60 * 60 * 1000;
+
+/** Minuscole, senza accenti, punteggiatura e spazi extra. */
+function normalizza(s) {
+  return String(s == null ? '' : s)
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[’‘`´]/g, "'")
+    .replace(/[.,;:!?¡¿"“”«»()\[\]{}]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Chiave per riconoscere i duplicati: senza maiuscole, accenti e spazi. */
+function chiaveDuplicato(s) { return normalizza(s).replace(/\s+/g, ''); }
+
+/** "arrendersi, rinunciare" -> ["arrendersi", "rinunciare"] */
+function dividiVarianti(s) {
+  return String(s == null ? '' : s).split(',').map(x => x.trim()).filter(Boolean);
+}
+
+/** Distanza di Levenshtein (si esce presto se le lunghezze differiscono di più di 1). */
+function distanza(a, b) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > 1) return 2;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+/** Forme accettabili di una risposta; per l'inglese "to give up" vale anche "give up". */
+function formeRisposta(s, lingua) {
+  const n = normalizza(s);
+  const forme = new Set([n]);
+  if (lingua === 'en' && n.startsWith('to ')) forme.add(n.slice(3));
+  return [...forme].filter(Boolean);
+}
+
+/**
+ * Correzione tollerante.
+ * @returns {{esito: 'corretta'|'quasi'|'sbagliata'}}
+ *  'quasi' = una sola lettera di differenza (conta come corretta, ma va segnalata).
+ */
+function verificaRisposta(risposta, accettate, lingua) {
+  const date = formeRisposta(risposta, lingua);
+  if (!date.length) return { esito: 'sbagliata' };
+  let quasi = false;
+  for (const acc of accettate) {
+    for (const a of formeRisposta(acc, lingua)) {
+      for (const r of date) {
+        if (a === r) return { esito: 'corretta' };
+        if (Math.max(a.length, r.length) >= CONFIG.LUNGHEZZA_MIN_REFUSO && distanza(a, r) <= 1) quasi = true;
+      }
+    }
+  }
+  return { esito: quasi ? 'quasi' : 'sbagliata' };
+}
+
+/**
+ * Peso di estrazione di una parola:
+ *   peso = 1 + erroriEffettivi × MOLTIPLICATORE_ERRORI + bonusNuova + bonusNonVistaDaTempo
+ * limitato a [PESO_MIN, PESO_MAX].
+ * erroriEffettivi = volteSbagliata / SMORZAMENTO_ERRORI ^ serieGiuste: una parola sbagliata
+ * in passato ma ora indovinata più volte di fila smette di occupare i posti "errori".
+ * (La classifica continua a mostrare gli errori totali.)
+ */
+function calcolaPeso(parola, ora) {
+  const erroriEffettivi = (parola.volteSbagliata || 0) / Math.pow(CONFIG.SMORZAMENTO_ERRORI, parola.serieGiuste || 0);
+  let peso = 1 + erroriEffettivi * CONFIG.MOLTIPLICATORE_ERRORI;
+  if (!parola.volteMostrata) {
+    peso += CONFIG.BONUS_NUOVA;
+  } else if (!parola.ultimaVolta || ora - parola.ultimaVolta > CONFIG.GIORNI_NON_VISTA * GIORNO_MS) {
+    peso += CONFIG.BONUS_NON_VISTA;
+  }
+  return Math.max(CONFIG.PESO_MIN, Math.min(CONFIG.PESO_MAX, peso));
+}
+
+/**
+ * Estrazione casuale PESATA SENZA REINSERIMENTO (funzione pura).
+ * A ogni giro si sceglie una parola con probabilità peso/sommaPesi e la si
+ * toglie dal sacchetto: il risultato non contiene mai duplicati.
+ * @param {Array} parole   elenco completo
+ * @param {number} n       quante estrarne (se sono meno, le prende tutte)
+ * @param {number} ora     timestamp "adesso" (passato da fuori per testabilità)
+ * @param {Function} rng   generatore in [0,1) — default Math.random
+ * @param {Function} peso  funzione peso (default calcolaPeso; () => 1 = estrazione uniforme)
+ */
+function estraiPesata(parole, n, ora, rng = Math.random, peso = calcolaPeso) {
+  const sacchetto = parole.map(p => ({ p, w: peso(p, ora) }));
+  const estratte = [];
+  const k = Math.min(n, sacchetto.length);
+  while (estratte.length < k) {
+    const totale = sacchetto.reduce((s, x) => s + x.w, 0);
+    let r = rng() * totale;
+    let i = 0;
+    for (; i < sacchetto.length - 1; i++) {
+      r -= sacchetto[i].w;
+      if (r < 0) break;
+    }
+    estratte.push(sacchetto[i].p);
+    sacchetto.splice(i, 1);
+  }
+  return estratte;
+}
+
+/** Cerca la parola (o una sua variante, anche senza "to ") nella frase, a parola intera. */
+function trovaInFrase(frase, inglese) {
+  if (!frase) return null;
+  const basso = frase.toLowerCase();
+  const candidati = [];
+  for (const v of dividiVarianti(inglese)) {
+    const t = v.toLowerCase().trim();
+    candidati.push(t);
+    if (t.startsWith('to ')) candidati.push(t.slice(3));
+  }
+  const lettera = /[\p{L}\p{N}]/u;
+  for (const c of candidati) {
+    if (!c) continue;
+    let pos = basso.indexOf(c);
+    while (pos !== -1) {
+      const prima = pos === 0 ? '' : basso[pos - 1];
+      const dopo = basso[pos + c.length] || '';
+      if (!lettera.test(prima) && !lettera.test(dopo)) {
+        return { start: pos, end: pos + c.length, testo: frase.slice(pos, pos + c.length) };
+      }
+      pos = basso.indexOf(c, pos + 1);
+    }
+  }
+  return null;
+}
+
+/** Tipi di domanda possibili per una parola. */
+function tipiDisponibili(parola) {
+  const tipi = ['it-en', 'en-it'];
+  if (parola.esempio && parola.esempio.trim()) {
+    tipi.push('frase');
+    if (trovaInFrase(parola.esempio, parola.inglese)) tipi.push('completa');
+  }
+  return tipi;
+}
+
+/** Sceglie a caso n parole tra le prime (n × CANDIDATI_PER_POSTO) di un elenco già ordinato. */
+function prendiInTestaACaso(ordinate, n, rng) {
+  return estraiPesata(ordinate.slice(0, n * CONFIG.CANDIDATI_PER_POSTO), n, 0, rng, () => 1);
+}
+
+/**
+ * Sceglie le parole del test (tutte distinte), in 3 corsie:
+ *  1) NUOVE: fino a POSTI_NUOVE parole mai uscite, partendo dalle aggiunte da più tempo
+ *     -> ogni parola nuova arriva presto, anche se ne aggiungi molte;
+ *  2) ROTAZIONE: fino a POSTI_ROTAZIONE parole già viste, partendo da quelle che non
+ *     escono da più tempo -> TUTTE le parole tornano a giro, anche quelle sempre indovinate;
+ *  3) ERRORI: i posti restanti (e quelli non usati sopra) con estrazione pesata tra le
+ *     parole "da ripassare" (sbagliate e non ancora indovinate GIUSTE_PER_USCIRE volte di
+ *     fila); se non bastano, estrazione pesata tra tutte le altre.
+ *     Pescare solo tra le parole deboli evita che, con un vocabolario grande, le tante
+ *     parole già note "diluiscano" quelle che sbagli.
+ * Nelle corsie 1 e 2 si pesca a caso tra le prime in coda, così l'ordine non è prevedibile.
+ * L'ordine finale delle domande viene mescolato.
+ */
+function scegliParole(parole, n, ora, rng = Math.random) {
+  const k = Math.min(n, parole.length);
+  const scelte = [];
+  const usate = new Set();
+  const aggiungi = arr => arr.forEach(p => { usate.add(p); scelte.push(p); });
+  const libere = () => parole.filter(p => !usate.has(p));
+
+  const nuove = parole.filter(p => !p.volteMostrata)
+    .sort((a, b) => String(a.dataAggiunta).localeCompare(String(b.dataAggiunta)));
+  aggiungi(prendiInTestaACaso(nuove, Math.min(CONFIG.POSTI_NUOVE, k), rng));
+
+  const viste = libere().filter(p => p.volteMostrata)
+    .sort((a, b) => (a.ultimaVolta || 0) - (b.ultimaVolta || 0));
+  aggiungi(prendiInTestaACaso(viste, Math.min(CONFIG.POSTI_ROTAZIONE, k - scelte.length), rng));
+
+  const daRipassare = libere().filter(p => p.volteSbagliata && (p.serieGiuste || 0) < CONFIG.GIUSTE_PER_USCIRE);
+  aggiungi(estraiPesata(daRipassare, k - scelte.length, ora, rng));
+  aggiungi(estraiPesata(libere(), k - scelte.length, ora, rng));
+
+  const tutte = scelte;
+  for (let i = tutte.length - 1; i > 0; i--) {   // mescolamento Fisher-Yates
+    const j = Math.floor(rng() * (i + 1));
+    [tutte[i], tutte[j]] = [tutte[j], tutte[i]];
+  }
+  return tutte;
+}
+
+/** Crea le domande del test: parole distinte + tipo casuale per ciascuna. */
+function creaDomande(parole, n, ora, rng = Math.random) {
+  return scegliParole(parole, n, ora, rng).map(p => {
+    const tipi = tipiDisponibili(p);
+    return { id: p.id, tipo: tipi[Math.floor(rng() * tipi.length)] };
+  });
+}
+
+/** Risposte accettate e lingua attesa per una domanda. */
+function risposteAccettate(parola, tipo) {
+  if (tipo === 'it-en') return { lingua: 'en', accettate: dividiVarianti(parola.inglese) };
+  if (tipo === 'completa') {
+    const m = trovaInFrase(parola.esempio, parola.inglese);
+    return { lingua: 'en', accettate: [m ? m.testo : '', ...dividiVarianti(parola.inglese)].filter(Boolean) };
+  }
+  return { lingua: 'it', accettate: dividiVarianti(parola.italiano) };
+}
+
+/** Parole con almeno un errore, ordinate per errori (poi % errore) decrescenti. */
+function classificaErrori(parole) {
+  return parole
+    .filter(p => (p.volteSbagliata || 0) > 0)
+    .map(p => ({ ...p, pct: p.volteMostrata ? Math.round(p.volteSbagliata / p.volteMostrata * 100) : 0 }))
+    .sort((a, b) => b.volteSbagliata - a.volteSbagliata || b.pct - a.pct || a.inglese.localeCompare(b.inglese));
+}
+
+/**
+ * Stato di apprendimento di una parola:
+ *  'nuova'       mai uscita in un test
+ *  'sicura'      uscita e mai sbagliata
+ *  'recuperata'  sbagliata in passato, ora indovinata GIUSTE_PER_USCIRE volte di fila
+ *  'daRipassare' sbagliata e non ancora recuperata
+ */
+function statoParola(p) {
+  if (!p.volteMostrata) return 'nuova';
+  if (!p.volteSbagliata) return 'sicura';
+  return (p.serieGiuste || 0) >= CONFIG.GIUSTE_PER_USCIRE ? 'recuperata' : 'daRipassare';
+}
+
+/* ---- Percorso e certificati (calcolati solo dallo storico dei test) ---- */
+
+/** 'normale' | 'ripasso' | 'esame' | 'boss' (i record vecchi non hanno il campo tipo). */
+function tipoTest(t) { return t.tipo || (t.ripasso ? 'ripasso' : 'normale'); }
+
+/** Risposte giuste necessarie per superare un esame/boss di n domande. */
+function sogliaSuperamento(n, tipo) {
+  const s = tipo === 'boss' ? CONFIG.SOGLIA_BOSS : CONFIG.SOGLIA_ESAME;
+  return Math.ceil(n * s - 1e-9);
+}
+
+/**
+ * Ricostruisce a che punto è il percorso:
+ *   ogni TEST_PER_ESAME test normali arriva un traguardo, da ripetere finché non è superato:
+ *   i primi MINIBOSS_PER_BOSS traguardi del livello sono miniboss ('esame'), quello dopo è il boss;
+ *   battuto il boss si passa al livello successivo.
+ * @returns {{fase:'test'|'esame'|'boss', prossimo:'esame'|'boss', testFatti, esamiSuperati,
+ *            bossSconfitti, tentativi, livello}}  (esamiSuperati = miniboss superati nel livello)
+ */
+function calcolaPercorso(storico) {
+  const st = { fase: 'test', testFatti: 0, esamiSuperati: 0, bossSconfitti: 0, tentativi: 0 };
+  for (const t of storico) {
+    const tipo = tipoTest(t);
+    const superato = t.domande - t.errori >= sogliaSuperamento(t.domande, tipo);
+    if (st.fase === 'test' && tipo === 'normale') {
+      if (++st.testFatti >= CONFIG.TEST_PER_ESAME) {
+        st.fase = st.esamiSuperati >= CONFIG.MINIBOSS_PER_BOSS ? 'boss' : 'esame';
+        st.tentativi = 0;
+      }
+    } else if (st.fase === 'esame' && tipo === 'esame') {
+      if (superato) { st.esamiSuperati++; st.testFatti = 0; st.tentativi = 0; st.fase = 'test'; }
+      else st.tentativi++;
+    } else if (st.fase === 'boss' && tipo === 'boss') {
+      if (superato) { st.bossSconfitti++; st.esamiSuperati = 0; st.testFatti = 0; st.tentativi = 0; st.fase = 'test'; }
+      else st.tentativi++;
+    }
+  }
+  st.prossimo = st.esamiSuperati >= CONFIG.MINIBOSS_PER_BOSS ? 'boss' : 'esame';
+  st.livello = st.bossSconfitti + 1;
+  return st;
+}
+
+/**
+ * Certificati: per ogni traguardo, se è stato raggiunto e quando.
+ * Test completati / senza errori: contano test normali, miniboss e boss ("ripeti solo gli errori" no).
+ * Miniboss superati / boss sconfitti: contano le prove superate.
+ */
+function calcolaCertificati(storico) {
+  const validi = storico.filter(t => tipoTest(t) !== 'ripasso');
+  const perfetti = validi.filter(t => t.errori === 0);
+  const vinti = tipo => storico.filter(t => tipoTest(t) === tipo && t.domande - t.errori >= sogliaSuperamento(t.domande, tipo));
+  const miniboss = vinti('esame'), boss = vinti('boss');
+  const serie = (lista, nome, traguardi) => traguardi.map(s => ({
+    serie: nome, soglia: s, ottenuto: lista.length >= s, data: lista.length >= s ? lista[s - 1].data : null
+  }));
+  return {
+    svolti: validi.length, perfetti: perfetti.length, miniboss: miniboss.length, boss: boss.length,
+    badge: [...serie(validi, 'svolti', CONFIG.TRAGUARDI), ...serie(perfetti, 'perfetti', CONFIG.TRAGUARDI),
+            ...serie(miniboss, 'miniboss', CONFIG.TRAGUARDI_MINIBOSS), ...serie(boss, 'boss', CONFIG.TRAGUARDI_BOSS)]
+  };
+}
+
+/** "2026-10-06" nel fuso orario locale. */
+function chiaveGiorno(ts) {
+  const d = new Date(ts);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+/** Conta gli eventi per giorno negli ultimi `giorni` giorni (oggi incluso): [{data, valore}]. */
+function contaPerGiorno(timestamps, giorni, ora) {
+  const conta = {};
+  for (const t of timestamps) { const k = chiaveGiorno(t); conta[k] = (conta[k] || 0) + 1; }
+  const oggi = new Date(ora); oggi.setHours(12, 0, 0, 0);
+  const out = [];
+  for (let i = giorni - 1; i >= 0; i--) {
+    const d = new Date(oggi); d.setDate(d.getDate() - i);
+    out.push({ data: d, valore: conta[chiaveGiorno(d)] || 0 });
+  }
+  return out;
+}
+</script>
+
+<!-- =====================================================================
+     INTERFACCIA
+     ===================================================================== -->
+<script>
+'use strict';
+const CHIAVE_STORAGE = 'vocabolario-inglese-v1';
+const CHIAVE_STORICO = 'vocabolario-inglese-storico-v1';   // un record per ogni test completato
+const CHIAVE_IMMAGINI = 'vocabolario-inglese-immagini-v1'; // { idParola: "data:image/..." } salvate a parte
+let immagini = {};
+const $ = id => document.getElementById(id);
+
+const ESEMPI = [
+  { inglese: 'give up', italiano: 'arrendersi, rinunciare', esempio: "Don't give up on your dreams." },
+  { inglese: 'eventually', italiano: 'alla fine, prima o poi', esempio: 'Eventually, she found a new job.' },
+  { inglese: 'actually', italiano: 'in realtà, effettivamente', esempio: "Actually, I've never been to London." },
+  { inglese: 'bargain', italiano: 'affare, occasione', esempio: 'This jacket was a real bargain.' },
+  { inglese: 'reliable', italiano: 'affidabile', esempio: '' }
+];
+
+/* ---------------- Stato e persistenza ---------------- */
+let parole = [];
+let storico = [];   // [{ data, tipo, domande, errori, quasi, ripasso, recuperate }]
+
+const TIPI_TEST = ['normale', 'ripasso', 'esame', 'boss'];
+function sanificaTest(t) {
+  if (!t || !Number(t.data) || !Number(t.domande)) return null;
+  const tipo = TIPI_TEST.includes(t.tipo) ? t.tipo : (t.ripasso ? 'ripasso' : 'normale');
+  return { data: Number(t.data), tipo, domande: Number(t.domande), errori: Math.max(0, Number(t.errori) || 0),
+           quasi: Math.max(0, Number(t.quasi) || 0), ripasso: tipo === 'ripasso',
+           recuperate: Math.max(0, Number(t.recuperate) || 0) };
+}
+
+function nuovoId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+function creaParola(inglese, italiano, esempio) {
+  return { id: nuovoId(), inglese: inglese.trim(), italiano: italiano.trim(), esempio: (esempio || '').trim(),
+           dataAggiunta: new Date().toISOString(), volteMostrata: 0, volteSbagliata: 0, ultimaVolta: null, serieGiuste: 0 };
+}
+
+function sanifica(p) {
+  if (!p || typeof p.inglese !== 'string' || typeof p.italiano !== 'string' || !p.inglese.trim() || !p.italiano.trim()) return null;
+  return {
+    id: typeof p.id === 'string' && p.id ? p.id : nuovoId(),
+    inglese: p.inglese.trim(), italiano: p.italiano.trim(),
+    esempio: typeof p.esempio === 'string' ? p.esempio.trim() : '',
+    dataAggiunta: p.dataAggiunta || new Date().toISOString(),
+    volteMostrata: Math.max(0, Number(p.volteMostrata) || 0),
+    volteSbagliata: Math.max(0, Number(p.volteSbagliata) || 0),
+    ultimaVolta: Number(p.ultimaVolta) || null,
+    serieGiuste: Math.max(0, Number(p.serieGiuste) || 0)
+  };
+}
+
+function carica() {
+  try {
+    const raw = localStorage.getItem(CHIAVE_STORAGE);
+    if (raw === null) {               // primo avvio: parole di esempio
+      parole = ESEMPI.map(e => creaParola(e.inglese, e.italiano, e.esempio));
+      salva();
+    } else {
+      parole = (JSON.parse(raw) || []).map(sanifica).filter(Boolean);
+    }
+  } catch (e) {
+    console.error(e);
+    parole = ESEMPI.map(e => creaParola(e.inglese, e.italiano, e.esempio));
+    mostraMsg('form-msg', 'Impossibile leggere i dati salvati: il browser potrebbe bloccare il salvataggio locale.', 'err');
+  }
+  try {
+    storico = (JSON.parse(localStorage.getItem(CHIAVE_STORICO)) || []).map(sanificaTest).filter(Boolean);
+  } catch (e) {
+    console.error(e);
+    storico = [];
+  }
+  try {
+    immagini = sanificaImmagini(JSON.parse(localStorage.getItem(CHIAVE_IMMAGINI)));
+  } catch (e) {
+    console.error(e);
+    immagini = {};
+  }
+}
+
+function sanificaImmagini(obj) {
+  const out = {};
+  if (obj && typeof obj === 'object') {
+    for (const [id, url] of Object.entries(obj)) if (typeof url === 'string' && url.startsWith('data:image/')) out[id] = url;
+  }
+  return out;
+}
+
+/** Le immagini si salvano a parte (sono pesanti): solo quando cambiano. */
+function salvaImmagini() {
+  try {
+    localStorage.setItem(CHIAVE_IMMAGINI, JSON.stringify(immagini));
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+/** Spazio occupato nel browser, in MB (stima: localStorage conta i caratteri). */
+function spazioUsatoMB() {
+  let n = 0;
+  try { for (const k of [CHIAVE_STORAGE, CHIAVE_STORICO, CHIAVE_IMMAGINI]) n += (localStorage.getItem(k) || '').length; } catch (e) { /* ignora */ }
+  return n * 2 / 1024 / 1024;
+}
+
+function salva() {
+  try {
+    localStorage.setItem(CHIAVE_STORAGE, JSON.stringify(parole));
+    localStorage.setItem(CHIAVE_STORICO, JSON.stringify(storico));
+    return true;
+  } catch (e) {
+    console.error(e);
+    mostraMsg('form-msg', 'Attenzione: impossibile salvare i dati in questo browser. Esporta un backup!', 'err');
+    return false;
+  }
+}
+
+function trovaDuplicato(inglese, escludiId) {
+  const k = chiaveDuplicato(inglese);
+  return parole.find(p => p.id !== escludiId && chiaveDuplicato(p.inglese) === k);
+}
+
+/* ---------------- Utilità UI ---------------- */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+const timers = {};
+function mostraMsg(id, testo, tipo = 'info', durata = 5000) {
+  const el = $(id);
+  if (!el) return;
+  el.innerHTML = testo ? `<div class="msg ${tipo}">${testo}</div>` : '';
+  clearTimeout(timers[id]);
+  if (testo && durata) timers[id] = setTimeout(() => { el.innerHTML = ''; }, durata);
+}
+
+/* ---------------- Navigazione ---------------- */
+const SCHEDE = ['aggiungi', 'studio', 'test', 'classifica'];
+function vaiA(nome) {
+  $('tooltip').hidden = true;
+  for (const s of SCHEDE) {
+    $('tab-' + s).setAttribute('aria-selected', String(s === nome));
+    $('sez-' + s).hidden = s !== nome;
+  }
+  if (nome === 'test') { renderTest(); renderClassifiche(); }
+  if (nome === 'classifica') renderClassifiche();
+  if (nome === 'studio') renderStudio();
+  if (nome === 'aggiungi') $('f-inglese').focus();
+}
+SCHEDE.forEach((s, i) => {
+  const tab = $('tab-' + s);
+  tab.addEventListener('click', () => vaiA(s));
+  tab.addEventListener('keydown', e => {   // frecce sinistra/destra tra le schede
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const j = (i + (e.key === 'ArrowRight' ? 1 : SCHEDE.length - 1)) % SCHEDE.length;
+      vaiA(SCHEDE[j]); $('tab-' + SCHEDE[j]).focus();
+    }
+  });
+});
+
+/* ---------------- Aggiungi / modifica ---------------- */
+function aggiornaHintEsempio() { $('hint-esempio').hidden = $('f-esempio').value.trim() !== ''; }
+$('f-esempio').addEventListener('input', aggiornaHintEsempio);
+
+function resetForm() {
+  $('form-parola').reset();
+  $('f-id').value = '';
+  $('form-titolo').textContent = 'Nuova parola';
+  $('f-salva').textContent = 'Aggiungi parola';
+  $('f-annulla').hidden = true;
+  aggiornaHintEsempio();
+}
+$('f-annulla').addEventListener('click', () => { resetForm(); $('f-inglese').focus(); });
+
+$('form-parola').addEventListener('submit', e => {
+  e.preventDefault();
+  const id = $('f-id').value;
+  const inglese = $('f-inglese').value.trim();
+  const italiano = $('f-italiano').value.trim();
+  const esempio = $('f-esempio').value.trim();
+  if (!inglese || !italiano) {
+    mostraMsg('form-msg', 'Compila sia la parola inglese sia la traduzione italiana.', 'err');
+    (inglese ? $('f-italiano') : $('f-inglese')).focus();
+    return;
+  }
+  const dup = trovaDuplicato(inglese, id);
+  if (dup) {
+    mostraMsg('form-msg', `«${esc(dup.inglese)}» è già nel tuo vocabolario (${esc(dup.italiano)}).`, 'warn');
+    $('f-inglese').focus();
+    return;
+  }
+  if (id) {
+    const p = parole.find(x => x.id === id);
+    if (p) Object.assign(p, { inglese, italiano, esempio });
+    mostraMsg('form-msg', `Modifiche salvate per «${esc(inglese)}».`, 'ok');
+  } else {
+    parole.push(creaParola(inglese, italiano, esempio));
+    mostraMsg('form-msg', `«${esc(inglese)}» aggiunta!`, 'ok');
+  }
+  salva();
+  resetForm();
+  renderLista();
+  $('f-inglese').focus();
+});
+
+function modifica(id) {
+  const p = parole.find(x => x.id === id);
+  if (!p) return;
+  $('f-id').value = p.id;
+  $('f-inglese').value = p.inglese;
+  $('f-italiano').value = p.italiano;
+  $('f-esempio').value = p.esempio;
+  $('form-titolo').textContent = 'Modifica parola';
+  $('f-salva').textContent = 'Salva modifiche';
+  $('f-annulla').hidden = false;
+  aggiornaHintEsempio();
+  $('f-inglese').focus();
+  $('form-parola').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function elimina(id) {
+  const p = parole.find(x => x.id === id);
+  if (!p || !confirm(`Eliminare «${p.inglese}» dal vocabolario?`)) return;
+  parole = parole.filter(x => x.id !== id);
+  if (immagini[id]) { delete immagini[id]; salvaImmagini(); }
+  if ($('f-id').value === id) resetForm();
+  salva();
+  renderLista();
+  mostraMsg('form-msg', `«${esc(p.inglese)}» eliminata.`, 'info');
+}
+
+function renderLista() {
+  $('contatore').textContent = parole.length;
+  const q = normalizza($('cerca').value);
+  const filtrate = parole
+    .filter(p => !q || normalizza(p.inglese).includes(q) || normalizza(p.italiano).includes(q))
+    .sort((a, b) => a.inglese.localeCompare(b.inglese));
+  if (!parole.length) { $('lista').innerHTML = '<li class="hint">Nessuna parola ancora. Aggiungi la prima!</li>'; return; }
+  if (!filtrate.length) { $('lista').innerHTML = '<li class="hint">Nessun risultato.</li>'; return; }
+  $('lista').innerHTML = filtrate.map(p => `
+    <li>
+      ${immagini[p.id] ? `<img class="mini-img" src="${immagini[p.id]}" alt="" loading="lazy">` : ''}
+      <div class="li-testo">
+        <div><span class="w">${esc(p.inglese)}</span> — ${esc(p.italiano)}</div>
+        ${p.esempio ? `<div class="ex">${esc(p.esempio)}</div>` : '<div class="st">senza frase d\'esempio</div>'}
+        <div class="st">Mostrata ${p.volteMostrata} · Sbagliata ${p.volteSbagliata}</div>
+      </div>
+      <div class="act">
+        <button class="btn sec small" data-img="${p.id}" aria-label="Immagine per ${esc(p.inglese)}" title="Immagine">🖼️</button>
+        <button class="btn sec small" data-mod="${p.id}" aria-label="Modifica ${esc(p.inglese)}">Modifica</button>
+        <button class="btn danger small" data-del="${p.id}" aria-label="Elimina ${esc(p.inglese)}">Elimina</button>
+      </div>
+    </li>`).join('');
+}
+$('cerca').addEventListener('input', renderLista);
+$('lista').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.mod) modifica(b.dataset.mod);
+  if (b.dataset.del) elimina(b.dataset.del);
+  if (b.dataset.img) apriImmagine(b.dataset.img);
+});
+
+/* ---------------- Inserimento multiplo ---------------- */
+$('bulk-btn').addEventListener('click', () => {
+  const righe = $('bulk').value.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+  if (!righe.length) { mostraMsg('bulk-msg', 'Incolla almeno una riga.', 'warn'); return; }
+  let aggiunte = 0; const duplicati = []; const errate = []; const scartate = [];
+  for (const riga of righe) {
+    const [ing = '', ita = '', ...resto] = riga.split(';').map(s => s.trim());
+    const frase = resto.join(';').trim();
+    if (!ing || !ita) { errate.push(riga); scartate.push(riga); continue; }
+    if (trovaDuplicato(ing)) { duplicati.push(ing); continue; }
+    parole.push(creaParola(ing, ita, frase));
+    aggiunte++;
+  }
+  salva();
+  renderLista();
+  $('bulk').value = scartate.join('\n');   // restano solo le righe da correggere
+  let m = `Aggiunte: <b>${aggiunte}</b>.`;
+  if (duplicati.length) m += ` Già presenti (saltate): ${duplicati.map(esc).join(', ')}.`;
+  if (errate.length) m += ` Righe non valide (lasciate nel riquadro): ${errate.length}.`;
+  mostraMsg('bulk-msg', m, errate.length || duplicati.length ? 'warn' : 'ok', 10000);
+});
+
+/* ---------------- Backup ---------------- */
+$('export-btn').addEventListener('click', () => {
+  const dati = JSON.stringify({ app: 'vocabolario-inglese', versione: 1, esportatoIl: new Date().toISOString(), parole, storico, immagini }, null, 2);
+  const url = URL.createObjectURL(new Blob([dati], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `vocabolario-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  mostraMsg('backup-msg', `Backup di ${parole.length} parole esportato.`, 'ok');
+});
+$('import-btn').addEventListener('click', () => $('import-file').click());
+$('import-file').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const json = JSON.parse(await file.text());
+    const arr = Array.isArray(json) ? json : json && Array.isArray(json.parole) ? json.parole : null;
+    if (!arr) throw new Error('formato');
+    const valide = arr.map(sanifica).filter(Boolean);
+    if (!valide.length) throw new Error('vuoto');
+    const testImportati = json && Array.isArray(json.storico) ? json.storico.map(sanificaTest).filter(Boolean) : null;
+    if (!confirm(`Il backup contiene ${valide.length} parole${testImportati ? ` e lo storico di ${testImportati.length} test` : ''}. Sostituire i dati attuali?`)) return;
+    parole = valide;
+    if (testImportati) storico = testImportati;   // i backup vecchi (senza storico) lasciano lo storico attuale
+    if (json && json.immagini) immagini = sanificaImmagini(json.immagini);
+    const ids = new Set(parole.map(p => p.id));
+    for (const id of Object.keys(immagini)) if (!ids.has(id)) delete immagini[id];   // niente immagini orfane
+    const immaginiOk = salvaImmagini();
+    if (!immaginiOk) { immagini = {}; salvaImmagini(); }
+    statoTest = { fase: 'inizio' };
+    salva(); resetForm(); renderLista(); renderClassifiche(); renderTest();
+    mostraMsg('backup-msg', `Importate ${valide.length} parole${testImportati ? ` e ${testImportati.length} test` : ''}.` +
+      (immaginiOk ? '' : ' Le immagini però non entrano nello spazio del browser e non sono state importate.'), immaginiOk ? 'ok' : 'warn', immaginiOk ? 5000 : 12000);
+  } catch (err) {
+    mostraMsg('backup-msg', 'File non valido: seleziona un backup JSON esportato da questa app.', 'err');
+  }
+});
+
+/* ---------------- Test ---------------- */
+const NOMI_TIPO = {
+  'it-en': 'Italiano → Inglese',
+  'en-it': 'Inglese → Italiano',
+  'frase': 'Traduci nel contesto',
+  'completa': 'Completa la frase'
+};
+let statoTest = { fase: 'inizio' };   // fasi: inizio | domanda | feedback | fine
+
+const DOMANDE_PER_TIPO = {
+  normale: () => CONFIG.DOMANDE_PER_TEST, ripasso: () => CONFIG.DOMANDE_RIPASSO_MAX,
+  esame: () => CONFIG.DOMANDE_ESAME, boss: () => CONFIG.DOMANDE_BOSS
+};
+const NOME_PROVA = { normale: 'Test', ripasso: 'Ripasso errori', esame: '⚔️ Miniboss', boss: '👹 Boss finale' };
+const ICONA_PROVA = { esame: '⚔️', boss: '👹' };
+
+/** @param tipo 'normale' | 'ripasso' | 'esame' | 'boss' */
+function avviaTest(pool, tipo = 'normale', nota = '') {
+  const n = Math.min(DOMANDE_PER_TIPO[tipo](), pool.length);
+  const domande = creaDomande(pool, n, Date.now());
+  // Verifica di sanità: nessun duplicato e numero corretto di domande
+  const ids = domande.map(d => d.id);
+  console.assert(new Set(ids).size === ids.length, 'Test con parole duplicate!', ids);
+  console.assert(domande.length === n, 'Numero di domande inatteso', domande.length, n);
+  const soglia = tipo === 'esame' || tipo === 'boss' ? sogliaSuperamento(n, tipo) : null;
+  statoTest = { fase: 'domanda', tipo, soglia, domande, indice: 0, risultati: [], nota };
+  renderTest();
+}
+
+/** Avvia la prova che il percorso richiede adesso: test normale, miniboss o boss. */
+function avviaProssimo() {
+  const f = calcolaPercorso(storico).fase;
+  avviaTest(parole, f === 'test' ? 'normale' : f);
+}
+
+/** Etichetta del pulsante che avvia la prossima prova. */
+function etichettaProssimo(perc, appenaFallito) {
+  if (perc.fase === 'esame') return appenaFallito ? '🔁 Riprova il miniboss' : '⚔️ Affronta il miniboss';
+  if (perc.fase === 'boss') return appenaFallito ? '🔁 Riprova il boss' : '👹 Affronta il boss';
+  return 'Nuovo test';
+}
+
+/** Linee con obiettivi: test verso il prossimo traguardo + traguardi del livello verso il boss. */
+function htmlPercorsoBreve(perc) {
+  const prossimo = perc.fase === 'test' ? perc.prossimo : perc.fase;
+  const fatti = perc.fase === 'test' ? perc.testFatti : CONFIG.TEST_PER_ESAME;
+  return `<div class="obiettivo"><div class="obiettivo-testo"><span>Test verso il prossimo ${prossimo === 'boss' ? 'boss 👹' : 'miniboss ⚔️'}</span>
+      <b>${fatti}/${CONFIG.TEST_PER_ESAME}</b></div>${htmlTraccia(fatti, CONFIG.TEST_PER_ESAME, ICONA_PROVA[prossimo], perc.fase !== 'test')}</div>
+    <div class="obiettivo"><div class="obiettivo-testo"><span>Livello ${perc.livello} · miniboss superati, poi il boss</span>
+      <b>${perc.esamiSuperati}/${CONFIG.MINIBOSS_PER_BOSS}</b></div>${htmlTraccia(perc.esamiSuperati, CONFIG.MINIBOSS_PER_BOSS, '👹', perc.fase === 'boss', '⚔️', perc.fase === 'esame')}</div>`;
+}
+
+/**
+ * Linea con N tappe e un obiettivo finale.
+ * iconaTappa: se indicata, le tappe sono "piccoli traguardi" con icona (es. i miniboss);
+ * tappaAttiva: la tappa da affrontare adesso viene evidenziata.
+ */
+function htmlTraccia(fatti, totale, icona, metaAttiva, iconaTappa = '', tappaAttiva = false) {
+  let h = '<div class="traccia" aria-hidden="true">';
+  for (let i = 0; i < totale; i++) {
+    const cls = `nodo${iconaTappa ? ' tappa' : ''}${i < fatti ? ' on' : ''}${tappaAttiva && i === fatti ? ' attiva' : ''}`;
+    h += `${i ? `<span class="seg${i < fatti ? ' on' : ''}"></span>` : ''}<span class="${cls}">${iconaTappa}</span>`;
+  }
+  return h + `<span class="seg${fatti >= totale ? ' on' : ''}"></span><span class="meta${metaAttiva || fatti >= totale ? ' attiva' : ''}">${icona}</span></div>`;
+}
+
+function domandaCorrente() {
+  const d = statoTest.domande[statoTest.indice];
+  return { d, p: parole.find(x => x.id === d.id) };
+}
+
+function htmlDomanda(p, tipo) {
+  if (tipo === 'it-en') return `<div class="hint">Come si dice in inglese?</div><div class="prompt" lang="it">${esc(p.italiano)}</div>`;
+  if (tipo === 'en-it') return `<div class="hint">Che cosa significa in italiano?</div><div class="prompt" lang="en">${esc(p.inglese)}</div>`;
+  const m = trovaInFrase(p.esempio, p.inglese);
+  if (tipo === 'frase') {
+    const frase = m
+      ? esc(p.esempio.slice(0, m.start)) + '<mark>' + esc(m.testo) + '</mark>' + esc(p.esempio.slice(m.end))
+      : esc(p.esempio);
+    const chi = m ? 'la parola evidenziata' : `«${esc(p.inglese)}»`;
+    return `<div class="hint">Che cosa significa ${chi} in questa frase? Rispondi in italiano.</div>
+            <div class="sentence" lang="en">${frase}</div>`;
+  }
+  // completa
+  const frase = esc(p.esempio.slice(0, m.start)) + '<span class="blank">_____</span>' + esc(p.esempio.slice(m.end));
+  return `<div class="hint">Scrivi la parola inglese mancante.</div>
+          <div class="sentence" lang="en">${frase}</div>
+          <div class="hint">Suggerimento: significa «${esc(p.italiano)}»</div>`;
+}
+
+function renderTest() {
+  const area = $('test-area');
+  const s = statoTest;
+
+  if (s.fase === 'inizio') {
+    if (!parole.length) {
+      area.innerHTML = `<h2>Test</h2><p>Non hai ancora parole nel vocabolario. Aggiungine qualcuna per iniziare!</p>
+        <div class="row"><button class="btn" id="vai-aggiungi">Aggiungi parole</button></div>`;
+      $('vai-aggiungi').onclick = () => vaiA('aggiungi');
+      return;
+    }
+    const perc = calcolaPercorso(storico);
+    const tipo = perc.fase === 'test' ? 'normale' : perc.fase;
+    const voluto = DOMANDE_PER_TIPO[tipo]();
+    const n = Math.min(voluto, parole.length);
+    const avviso = parole.length < voluto
+      ? `<div class="msg warn">Hai solo ${plurale(parole.length, 'parola', 'parole')}: ${tipo === 'normale' ? 'il test' : 'la prova'} ne userà ${n}${tipo !== 'normale' ? ` e servono ${sogliaSuperamento(n, tipo)} risposte giuste` : ''}.</div>` : '';
+    const tentativi = perc.tentativi ? `<p class="hint">Tentativi non riusciti finora: <b>${perc.tentativi}</b>. Ogni tentativo è allenamento: dai che ci sei!</p>` : '';
+    let corpo;
+    if (tipo === 'normale') {
+      corpo = `<h2>Test</h2>
+        <p>${n} domande su parole diverse, pescate a caso da tutto il vocabolario: quelle che sbagli, quelle nuove e quelle che non vedi da un po' escono più spesso, ma anche quelle che sai bene tornano regolarmente. Premi <kbd>Invio</kbd> per confermare e andare avanti.</p>`;
+    } else if (tipo === 'esame') {
+      corpo = `<div class="prova-banner esame"><div class="prova-icona">⚔️</div><div>
+          <h2>Miniboss ${perc.esamiSuperati + 1} di ${CONFIG.MINIBOSS_PER_BOSS} · Livello ${perc.livello}</h2>
+          <p><b>${n} domande</b>: per superarlo servono almeno <b>${sogliaSuperamento(n, 'esame')} risposte giuste</b>.
+          Finché non lo superi, la prossima prova sarà sempre il miniboss.</p></div></div>${tentativi}`;
+    } else {
+      corpo = `<div class="prova-banner boss"><div class="prova-icona">👹</div><div>
+          <h2>Boss finale · Livello ${perc.livello}</h2>
+          <p><b>${n} domande</b>: per sconfiggerlo servono almeno <b>${sogliaSuperamento(n, 'boss')} risposte giuste</b>.
+          Battilo per passare al livello ${perc.livello + 1}!</p></div></div>${tentativi}`;
+    }
+    area.innerHTML = `${corpo}${htmlPercorsoBreve(perc)}${avviso}
+      <div class="row"><button class="btn" id="inizia">${etichettaProssimo(perc, false).replace('Nuovo test', 'Inizia test')}</button></div>`;
+    $('inizia').onclick = avviaProssimo;
+    $('inizia').focus();
+    return;
+  }
+
+  if (s.fase === 'domanda' || s.fase === 'feedback') {
+    const { d, p } = domandaCorrente();
+    const tot = s.domande.length, num = s.indice + 1;
+    const ris = s.fase === 'feedback' ? s.risultati[s.indice] : null;
+    const enAns = d.tipo === 'it-en' || d.tipo === 'completa';
+    let fb = '';
+    if (ris) {
+      const giusta = `<div class="sub">Risposta giusta: <b>${esc(ris.mostra)}</b></div>` +
+        (immagini[p.id] ? `<img class="fb-img" src="${immagini[p.id]}" alt="">` : '');
+      fb = ris.esito === 'corretta' ? `<div class="feedback ok">✓ Corretta!${ris.risposta && normalizza(ris.risposta) !== normalizza(ris.mostra) ? giusta : ''}</div>`
+         : ris.esito === 'quasi' ? `<div class="feedback warn">≈ Quasi giusta, attenzione all'ortografia!${giusta}</div>`
+         : `<div class="feedback err">✗ Sbagliata${ris.risposta ? '' : ' (nessuna risposta)'}${giusta}</div>`;
+    }
+    const cls = ris ? { corretta: 'ok', quasi: 'warn', sbagliata: 'err' }[ris.esito] : '';
+    let segnapunti = '';
+    if (s.soglia !== null) {
+      const ok = s.risultati.filter(r => r && r.esito !== 'sbagliata').length;
+      const ko = s.risultati.filter(r => r && r.esito === 'sbagliata').length;
+      const concessi = tot - s.soglia - ko;
+      segnapunti = `<div class="segnapunti ${s.tipo}">
+        <span><b>${NOME_PROVA[s.tipo]}</b> · obiettivo ${s.soglia}/${tot}</span>
+        <span>✓ ${ok} · ✗ ${ko} · ${concessi >= 0 ? `puoi sbagliarne ancora <b>${concessi}</b>` : '<b>obiettivo mancato</b>: continua ad allenarti'}</span>
+      </div>`;
+    }
+    area.innerHTML = `
+      ${segnapunti}
+      ${s.nota ? `<div class="msg info" style="margin:0 0 12px">${esc(s.nota)}</div>` : ''}
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${tot}" aria-valuenow="${num}" aria-label="Avanzamento">
+        <div style="width:${(num - (ris ? 0 : 1)) / tot * 100}%"></div></div>
+      <div class="qmeta"><span>Domanda ${num}/${tot}</span><span class="qtype">${NOMI_TIPO[d.tipo]}</span></div>
+      ${htmlDomanda(p, d.tipo)}
+      <form id="form-risposta" autocomplete="off">
+        <label for="risposta">La tua risposta ${enAns ? '(in inglese)' : '(in italiano)'}</label>
+        <input type="text" id="risposta" class="${cls}" autocapitalize="off" autocorrect="off" spellcheck="false"
+               lang="${enAns ? 'en' : 'it'}" ${ris ? `disabled value="${esc(ris.risposta)}"` : ''}>
+        ${fb}
+        <div class="row">
+          ${ris ? `<button type="button" class="btn" id="avanti">${num === tot ? 'Vedi risultato' : 'Avanti →'}</button>`
+                : `<button type="submit" class="btn">Conferma</button>`}
+          <button type="button" class="btn sec" id="interrompi">Interrompi</button>
+        </div>
+      </form>`;
+    $('interrompi').onclick = () => {
+      const msg = s.soglia !== null
+        ? 'Interrompere la prova? Non verrà conteggiata e dovrai ricominciarla da capo (le risposte già date restano nelle statistiche delle parole).'
+        : 'Interrompere il test? Le risposte già date restano nelle statistiche.';
+      if (confirm(msg)) { statoTest = { fase: 'inizio' }; renderTest(); }
+    };
+    if (ris) {
+      $('avanti').onclick = avanti;
+      $('avanti').focus();
+    } else {
+      $('form-risposta').onsubmit = e => { e.preventDefault(); rispondi($('risposta').value); };
+      $('risposta').focus();
+    }
+    return;
+  }
+
+  if (s.fase === 'fine') {
+    const tot = s.risultati.length;
+    const giuste = s.risultati.filter(r => r.esito !== 'sbagliata').length;
+    const quasi = s.risultati.filter(r => r.esito === 'quasi').length;
+    const errori = s.risultati.filter(r => r.esito === 'sbagliata');
+    const pct = Math.round(giuste / tot * 100);
+    const commento = pct === 100 ? 'Perfetto! 🎉' : pct >= 80 ? 'Ottimo lavoro! 💪' : pct >= 50 ? 'Buono, continua così!' : 'Non mollare: il ripasso funziona! 🔁';
+    const ex = s.esito || {};
+    const prova = s.soglia !== null;
+    const superata = prova && giuste >= s.soglia;
+    let titolo = 'Risultato', banner = '';
+    if (prova && superata) {
+      titolo = s.tipo === 'boss' ? '🏆 Boss sconfitto!' : '⚔️ Miniboss superato!';
+      banner = s.tipo === 'boss'
+        ? `<div class="msg ok">Livello ${ex.prima.livello} completato! Ora inizia il <b>livello ${ex.dopo.livello}</b>.</div>`
+        : `<div class="msg ok">Miniboss superati in questo livello: <b>${ex.dopo.esamiSuperati}/${CONFIG.MINIBOSS_PER_BOSS}</b>.
+           ${ex.dopo.prossimo === 'boss' ? `Dopo altri ${CONFIG.TEST_PER_ESAME} test ti aspetta il <b>boss finale</b> da ${CONFIG.DOMANDE_BOSS} domande! 👹` : ''}</div>`;
+    } else if (prova) {
+      titolo = s.tipo === 'boss' ? '👹 Il boss ha resistito…' : '⚔️ Miniboss non superato';
+      banner = `<div class="msg warn">Servivano <b>${s.soglia}</b> risposte giuste, ne hai date <b>${giuste}</b> (ne mancano ${s.soglia - giuste}). Ripassa gli errori e riprova!</div>`;
+    } else if (ex.prima && ex.prima.fase === 'test' && ex.dopo.fase !== 'test') {
+      banner = ex.dopo.fase === 'boss'
+        ? `<div class="msg info">👹 Hai completato ${CONFIG.TEST_PER_ESAME} test: è arrivato il <b>boss finale da ${CONFIG.DOMANDE_BOSS} domande</b>!</div>`
+        : `<div class="msg info">⚔️ Hai completato ${CONFIG.TEST_PER_ESAME} test: è arrivato il <b>miniboss da ${CONFIG.DOMANDE_ESAME} domande</b>!</div>`;
+    } else if (s.tipo === 'normale' && ex.dopo) {
+      banner = htmlPercorsoBreve(ex.dopo);
+    }
+    const nuovi = (ex.nuoviBadge || []).map(b => `<div class="nuovo-cert">${htmlCertificato(b)}<div><b>Nuovo certificato!</b><br>${descrCertificato(b)}</div></div>`).join('');
+    area.innerHTML = `<h2>${titolo}</h2>
+      <div class="score">${giuste}/${tot}</div>
+      <p>${prova ? '' : commento}${quasi ? ` <span class="hint">(${quasi} quasi giust${quasi === 1 ? 'a' : 'e'}: occhio all'ortografia)</span>` : ''}</p>
+      ${banner}${nuovi}
+      ${errori.length ? `<h3>Parole sbagliate</h3><ul class="list">${errori.map(r => {
+          const p = parole.find(x => x.id === r.id) || {};
+          return `<li><div><div><span class="w">${esc(p.inglese)}</span> — ${esc(p.italiano)}</div>
+                  <div class="st">Hai scritto: «${esc(r.risposta) || '—'}» · Giusta: <b>${esc(r.mostra)}</b></div></div></li>`;
+        }).join('')}</ul>` : '<div class="msg ok">Nessun errore in questo test!</div>'}
+      <div class="row">
+        <button class="btn" id="nuovo">${etichettaProssimo(calcolaPercorso(storico), prova && !superata)}</button>
+        ${errori.length ? '<button class="btn sec" id="ripeti">Ripeti solo gli errori</button>' : ''}
+      </div>`;
+    $('nuovo').onclick = avviaProssimo;
+    if (errori.length) {
+      $('ripeti').onclick = () => {
+        const ids = new Set(errori.map(r => r.id));
+        const pool = parole.filter(p => ids.has(p.id));
+        const n = Math.min(pool.length, CONFIG.DOMANDE_RIPASSO_MAX);
+        avviaTest(pool, 'ripasso', `Ripasso degli errori: ${plurale(n, 'parola', 'parole')}${pool.length > n ? ` (delle ${pool.length} sbagliate)` : ''}. Non conta per percorso e certificati.`);
+      };
+    }
+    $('nuovo').focus();
+  }
+}
+
+function rispondi(testo) {
+  const { d, p } = domandaCorrente();
+  const { lingua, accettate } = risposteAccettate(p, d.tipo);
+  const { esito } = verificaRisposta(testo, accettate, lingua);
+  // Aggiorna statistiche subito, a ogni risposta
+  p.volteMostrata++;
+  if (esito === 'sbagliata') { p.volteSbagliata++; p.serieGiuste = 0; } else p.serieGiuste = (p.serieGiuste || 0) + 1;
+  p.ultimaVolta = Date.now();
+  salva();
+  const mostra = d.tipo === 'completa' ? accettate[0] : (d.tipo === 'it-en' ? p.inglese : p.italiano);
+  statoTest.risultati[statoTest.indice] = { id: p.id, tipo: d.tipo, esito, risposta: testo.trim(), mostra };
+  statoTest.fase = 'feedback';
+  renderTest();
+}
+
+function avanti() {
+  if (statoTest.indice + 1 < statoTest.domande.length) {
+    statoTest.indice++;
+    statoTest.fase = 'domanda';
+  } else {
+    statoTest.fase = 'fine';
+    registraTest();
+  }
+  renderTest();
+}
+
+/** Salva nello storico la prova appena completata e annota percorso e nuovi certificati. */
+function registraTest() {
+  const r = statoTest.risultati;
+  const prima = calcolaPercorso(storico);
+  const chiave = b => b.serie + b.soglia;
+  const certPrima = new Set(calcolaCertificati(storico).badge.filter(b => b.ottenuto).map(chiave));
+  storico.push({
+    data: Date.now(),
+    tipo: statoTest.tipo,
+    domande: r.length,
+    errori: r.filter(x => x.esito === 'sbagliata').length,
+    quasi: r.filter(x => x.esito === 'quasi').length,
+    ripasso: statoTest.tipo === 'ripasso',
+    recuperate: parole.filter(p => statoParola(p) === 'recuperata').length
+  });
+  const nuoviBadge = calcolaCertificati(storico).badge.filter(b => b.ottenuto && !certPrima.has(chiave(b)));
+  statoTest.esito = { prima, dopo: calcolaPercorso(storico), nuoviBadge };
+  salva();
+  renderClassifiche();
+}
+
+function testInCorso() { return statoTest.fase === 'domanda' || statoTest.fase === 'feedback'; }
+
+/* ---------------- Classifica ---------------- */
+let mostraTutte = false;
+function tabellaClassifica(righe) {
+  return `<div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Inglese</th><th>Traduzione</th><th class="n">Errori</th><th class="n">Mostrata</th><th class="n">% err.</th></tr></thead>
+    <tbody>${righe.map((p, i) => `<tr>
+      <td>${i + 1}</td><td><b>${esc(p.inglese)}</b></td><td>${esc(p.italiano)}</td>
+      <td class="n">${p.volteSbagliata}</td><td class="n">${p.volteMostrata}</td>
+      <td class="n pct" style="color:${p.pct >= 50 ? 'var(--err)' : p.pct >= 25 ? 'var(--warn)' : 'var(--ok)'}">${p.pct}%</td>
+    </tr>`).join('')}</tbody></table></div>`;
+}
+function renderClassifiche() {
+  // Durante un test classifica e statistiche restano nascoste: niente sbirciate.
+  const bloccata = testInCorso();
+  $('classifica-bloccata').hidden = !bloccata;
+  $('classifica-contenuto').hidden = bloccata;
+  if (bloccata || $('sez-classifica').hidden) return;
+
+  const cl = classificaErrori(parole);
+  const vuota = `<div class="msg ok">${parole.some(p => p.volteMostrata) ? 'Nessun errore finora: complimenti! 🌟' : 'Ancora nessun errore registrato. Fai un test e la classifica si riempirà.'}</div>`;
+  $('classifica-completa').innerHTML = cl.length ? tabellaClassifica(mostraTutte ? cl : cl.slice(0, 20)) : vuota;
+  $('mostra-tutte').hidden = cl.length <= 20;
+  $('mostra-tutte').textContent = mostraTutte ? 'Mostra solo le prime 20' : `Mostra tutte (${cl.length})`;
+  renderStatistiche();
+}
+$('mostra-tutte').addEventListener('click', () => { mostraTutte = !mostraTutte; renderClassifiche(); });
+$('torna-test').addEventListener('click', () => vaiA('test'));
+$('azzera').addEventListener('click', () => {
+  if (!confirm('Azzerare tutte le statistiche (errori, volte mostrata e storico dei test per i grafici)? Le parole restano.')) return;
+  parole.forEach(p => { p.volteMostrata = 0; p.volteSbagliata = 0; p.ultimaVolta = null; p.serieGiuste = 0; });
+  storico = [];
+  salva(); renderClassifiche(); renderLista();
+  mostraMsg('classifica-msg', 'Statistiche azzerate.', 'ok');
+});
+
+/* ---------------- Statistiche e grafici ---------------- */
+const fmtGiorno = d => new Date(d).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+const fmtData = d => new Date(d).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) + ', ' +
+                     new Date(d).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+const plurale = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+const STATI = [
+  { k: 'daRipassare', nome: 'Da ripassare', colore: 'var(--c-ripassare)', desc: 'sbagliate e non ancora recuperate' },
+  { k: 'recuperata', nome: 'Recuperate', colore: 'var(--c-recuperata)', desc: `prima le sbagliavi, ora le indovini ${CONFIG.GIUSTE_PER_USCIRE} volte di fila` },
+  { k: 'sicura', nome: 'Sempre giuste', colore: 'var(--c-sicura)', desc: 'mai sbagliate' },
+  { k: 'nuova', nome: 'Nuove', colore: 'var(--c-nuova)', desc: 'mai uscite in un test' }
+];
+
+/* ---------------- Percorso e certificati ---------------- */
+/** Bronzo → argento → oro → diamante man mano che si sale nella serie. */
+function livelloCert(b) {
+  const lista = { svolti: CONFIG.TRAGUARDI, perfetti: CONFIG.TRAGUARDI, miniboss: CONFIG.TRAGUARDI_MINIBOSS, boss: CONFIG.TRAGUARDI_BOSS }[b.serie];
+  const f = lista.indexOf(b.soglia) / lista.length;
+  return f >= 0.85 ? 'diamante' : f >= 0.6 ? 'oro' : f >= 0.35 ? 'argento' : 'bronzo';
+}
+const INFO_SERIE = {
+  svolti:   { icona: '✓', cap: 'test',     descr: s => `${s} test completati` },
+  perfetti: { icona: '★', cap: 'perfetti', descr: s => `${s} test senza errori` },
+  miniboss: { icona: '⚔️', cap: 'miniboss', descr: s => `${s} miniboss superati` },
+  boss:     { icona: '👹', cap: 'boss',     descr: s => `${s} boss sconfitti` }
+};
+
+function htmlCertificato(b) {
+  const info = INFO_SERIE[b.serie];
+  const title = b.ottenuto ? `${descrCertificato(b)} · ottenuto il ${fmtData(b.data)}` : `${descrCertificato(b)} · da sbloccare`;
+  return `<div class="cert ${livelloCert(b)}${b.ottenuto ? ' ottenuto' : ''}" title="${title}">
+    <div class="medaglia"><span class="num">${b.soglia}</span><span class="ico">${b.ottenuto ? info.icona : '🔒'}</span></div>
+    <div class="cap">${info.cap}</div></div>`;
+}
+function descrCertificato(b) { return INFO_SERIE[b.serie].descr(b.soglia); }
+
+function renderPercorso() {
+  const p = calcolaPercorso(storico);
+  $('percorso-titolo').textContent = `Il tuo percorso · Livello ${p.livello}`;
+  const tentativi = p.tentativi ? ` Tentativi finora: ${p.tentativi}.` : '';
+  const stato = p.fase === 'test'
+    ? `Completa ancora <b>${plurale(CONFIG.TEST_PER_ESAME - p.testFatti, 'test', 'test')}</b> per arrivare al ${p.prossimo === 'boss' ? '<b>boss finale</b> 👹' : `miniboss ${p.esamiSuperati + 1} ⚔️`}.`
+    : p.fase === 'esame'
+      ? `⚔️ <b>Miniboss ${p.esamiSuperati + 1} da affrontare!</b> ${CONFIG.DOMANDE_ESAME} domande, servono ${sogliaSuperamento(CONFIG.DOMANDE_ESAME, 'esame')} giuste.${tentativi}`
+      : `👹 <b>Boss finale da affrontare!</b> ${CONFIG.DOMANDE_BOSS} domande, servono ${sogliaSuperamento(CONFIG.DOMANDE_BOSS, 'boss')} giuste.${tentativi}`;
+  const trofei = p.bossSconfitti
+    ? `<span class="trofei" title="Boss sconfitti">${'🏆'.repeat(Math.min(p.bossSconfitti, 10))}${p.bossSconfitti > 10 ? ' ×' + p.bossSconfitti : ''}</span>`
+    : '<span class="hint">ancora nessuno</span>';
+  $('percorso').innerHTML = `
+    <div class="msg ${p.fase === 'test' ? 'info' : 'warn'}" style="margin-top:0">${stato}</div>
+    ${htmlPercorsoBreve(p)}
+    <div class="obiettivo"><div class="obiettivo-testo"><span>Boss sconfitti (livelli completati)</span>${trofei}</div></div>
+    <p class="hint" style="margin:4px 0 0">Ogni livello: ${CONFIG.TEST_PER_ESAME} test → miniboss da ${CONFIG.DOMANDE_ESAME} (×${CONFIG.MINIBOSS_PER_BOSS}), poi ${CONFIG.TEST_PER_ESAME} test → boss da ${CONFIG.DOMANDE_BOSS}.</p>
+    <div class="row" style="margin-top:10px"><button class="btn" type="button" id="vai-prova">${etichettaProssimo(p, false).replace('Nuovo test', 'Vai al test')}</button></div>`;
+  $('vai-prova').onclick = () => vaiA('test');
+}
+
+function renderCertificati() {
+  const c = calcolaCertificati(storico);
+  const gruppo = (serie, titolo, fatti) => {
+    const lista = c.badge.filter(b => b.serie === serie);
+    const prossimo = lista.find(b => !b.ottenuto);
+    const precedente = [...lista].reverse().find(b => b.ottenuto);
+    const base = precedente ? precedente.soglia : 0;
+    const barra = prossimo
+      ? `<div class="obiettivo"><div class="obiettivo-testo"><span>Prossimo certificato: <b>${descrCertificato(prossimo)}</b></span><b>${fatti}/${prossimo.soglia}</b></div>
+         <div class="progress"><div style="width:${Math.min(100, (fatti - base) / (prossimo.soglia - base) * 100)}%"></div></div></div>`
+      : '<div class="msg ok">Hai ottenuto tutti i certificati di questa serie! 👑</div>';
+    return `<h3>${titolo} <span class="badge">${lista.filter(b => b.ottenuto).length}/${lista.length}</span></h3>
+      ${barra}<div class="certs">${lista.map(htmlCertificato).join('')}</div>`;
+  };
+  const spazio = '<div style="height:18px"></div>';
+  $('certificati').innerHTML =
+    gruppo('svolti', `Test completati: ${c.svolti}`, c.svolti) + spazio +
+    gruppo('perfetti', `Test senza errori: ${c.perfetti}`, c.perfetti) + spazio +
+    gruppo('miniboss', `Miniboss superati: ${c.miniboss}`, c.miniboss) + spazio +
+    gruppo('boss', `Boss sconfitti: ${c.boss}`, c.boss) +
+    '<p class="hint" style="margin-bottom:0">Test completati e senza errori: contano test, miniboss e boss ("Ripeti solo gli errori" no). Le medaglie passano da bronzo ad argento, oro e diamante salendo nella serie.</p>';
+}
+
+function renderStatistiche() {
+  renderPercorso();
+  renderCertificati();
+  const ora = Date.now();
+  const conta = { nuova: 0, sicura: 0, recuperata: 0, daRipassare: 0 };
+  parole.forEach(p => conta[statoParola(p)]++);
+  const oggi = chiaveGiorno(ora);
+  const testOggi = storico.filter(t => chiaveGiorno(t.data) === oggi).length;
+  const ultimi = storico.slice(-10);
+  const dom = ultimi.reduce((s, t) => s + t.domande, 0);
+  const pctGiuste = dom ? Math.round((dom - ultimi.reduce((s, t) => s + t.errori, 0)) / dom * 100) : null;
+
+  // Indicatori
+  $('kpi').innerHTML = [
+    { v: parole.length, l: 'Parole nel vocabolario', s: `${conta.nuova} ancora da vedere` },
+    { v: calcolaCertificati(storico).svolti, l: 'Test completati', s: `oggi: ${testOggi}` },
+    { v: pctGiuste === null ? '—' : pctGiuste + '%', l: 'Risposte giuste', s: 'negli ultimi 10 test' },
+    { v: conta.recuperata, l: 'Parole recuperate', s: `${conta.daRipassare} ancora da ripassare` }
+  ].map(k => `<div class="kpi"><div class="v">${k.v}</div><div class="l">${k.l}</div><div class="s">${k.s}</div></div>`).join('');
+
+  // Stato del vocabolario: barra divisa in parti + legenda con numeri
+  const tot = parole.length || 1;
+  $('ch-stato').innerHTML = parole.length ? `
+    <div class="stack" role="img" aria-label="${STATI.map(s => `${s.nome}: ${conta[s.k]}`).join(', ')}">
+      ${STATI.filter(s => conta[s.k]).map(s => `<div style="flex:${conta[s.k] / tot};background:${s.colore}" title="${s.nome}: ${conta[s.k]}"></div>`).join('')}
+    </div>
+    <div class="legend">${STATI.map(s => `<span title="${s.desc}"><span class="sw" style="background:${s.colore}"></span>${s.nome} <b>${conta[s.k]}</b></span>`).join('')}</div>`
+    : '<p class="hint">Nessuna parola nel vocabolario.</p>';
+
+  // 1) Errori in ogni test
+  const primoIndice = storico.length - Math.min(30, storico.length);
+  graficoBarre($('ch-errori'), storico.slice(-30).map((t, i) => ({
+    valore: t.errori,
+    etichetta: '#' + (primoIndice + i + 1),
+    tip: `<b>${tipoTest(t) === 'normale' ? 'Test' : NOME_PROVA[tipoTest(t)]} n. ${primoIndice + i + 1}</b><br>${fmtData(t.data)}<br>` +
+         `${t.errori ? `${plurale(t.errori, 'errore', 'errori')} su ${t.domande}` : `Nessun errore su ${t.domande} 🎉`}${t.quasi ? ` · ${t.quasi} quasi giust${t.quasi === 1 ? 'a' : 'e'}` : ''}`
+  })), { vuoto: 'Completa il primo test per vedere i tuoi errori test dopo test.', segnaZeri: true });
+
+  // 2) Test al giorno
+  graficoBarre($('ch-test'), contaPerGiorno(storico.map(t => t.data), 30, ora).map(g => ({
+    valore: g.valore, etichetta: g.data.getDate() + '/' + (g.data.getMonth() + 1),
+    tip: `<b>${fmtGiorno(g.data)}</b><br>${plurale(g.valore, 'test completato', 'test completati')}`
+  })), { vuoto: 'Nessun test completato negli ultimi 30 giorni.', vuotoSeZero: true });
+
+  // 3) Parole aggiunte al giorno
+  graficoBarre($('ch-aggiunte'), contaPerGiorno(parole.map(p => Date.parse(p.dataAggiunta)).filter(Boolean), 30, ora).map(g => ({
+    valore: g.valore, etichetta: g.data.getDate() + '/' + (g.data.getMonth() + 1),
+    tip: `<b>${fmtGiorno(g.data)}</b><br>${plurale(g.valore, 'parola aggiunta', 'parole aggiunte')}`
+  })), { vuoto: 'Nessuna parola aggiunta negli ultimi 30 giorni.', vuotoSeZero: true });
+
+  // 4) Parole recuperate: quante erano "recuperate" alla fine di ogni test
+  $('sottotitolo-recuperate').textContent =
+    `Parole che sbagliavi e ora indovini ${CONFIG.GIUSTE_PER_USCIRE} volte di fila · totale dopo ognuno degli ultimi 30 test`;
+  graficoBarre($('ch-recuperate'), storico.slice(-30).map((t, i) => ({
+    valore: t.recuperate,
+    etichetta: '#' + (primoIndice + i + 1),
+    tip: `<b>Dopo il test n. ${primoIndice + i + 1}</b><br>${fmtData(t.data)}<br>${plurale(t.recuperate, 'parola recuperata', 'parole recuperate')}`
+  })), { vuoto: 'Il grafico si riempie man mano che recuperi le parole sbagliate.', vuotoSeZero: true });
+  const recuperate = parole.filter(p => statoParola(p) === 'recuperata').sort((a, b) => (b.ultimaVolta || 0) - (a.ultimaVolta || 0));
+  $('lista-recuperate').innerHTML = recuperate.length
+    ? `<div class="chips">${recuperate.slice(0, 40).map(p => `<span class="chip" title="${esc(p.italiano)} · ${plurale(p.volteSbagliata, 'errore', 'errori')} in passato">✓ ${esc(p.inglese)}</span>`).join('')}${recuperate.length > 40 ? `<span class="chip">+${recuperate.length - 40}</span>` : ''}</div>`
+    : '';
+}
+
+/**
+ * Grafico a barre SVG (una sola serie). punti: [{ valore, etichetta, tip (HTML) }].
+ * Passando il mouse (o toccando) su una colonna compare il dettaglio.
+ */
+function graficoBarre(el, punti, { vuoto = 'Nessun dato.', vuotoSeZero = false, segnaZeri = false } = {}) {
+  if (!punti.length || (vuotoSeZero && punti.every(p => !p.valore))) {
+    el.innerHTML = `<p class="hint grafico-vuoto">${vuoto}</p>`;
+    return;
+  }
+  const W = Math.max(260, el.clientWidth || 520), H = 190;
+  const ml = 30, mr = 6, mt = 10, mb = 24;
+  const pw = W - ml - mr, ph = H - mt - mb;
+  const max = Math.max(1, ...punti.map(p => p.valore));
+  const passo = max <= 5 ? 1 : max <= 10 ? 2 : Math.ceil(max / 5 / 5) * 5;
+  const cima = Math.ceil(max / passo) * passo;
+  const y = v => mt + ph - v / cima * ph;
+  const slot = pw / punti.length;
+  const bw = Math.max(3, Math.min(26, slot * 0.68));
+  const ogni = Math.ceil(punti.length / Math.max(2, Math.floor(pw / 46)));   // etichette x senza sovrapposizioni
+
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafico a barre">`;
+  for (let v = 0; v <= cima; v += passo) {
+    svg += `<line x1="${ml}" x2="${W - mr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--border)" stroke-width="1"${v ? ' stroke-dasharray="2 3"' : ''}/>` +
+           `<text x="${ml - 6}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  }
+  punti.forEach((p, i) => {
+    const cx = ml + slot * i + slot / 2;
+    svg += `<rect class="hit" data-i="${i}" x="${ml + slot * i}" y="${mt}" width="${slot}" height="${ph}" rx="3"/>`;
+    if (p.valore > 0) {
+      const x0 = cx - bw / 2, x1 = cx + bw / 2, yb = y(0), yt = y(p.valore), r = Math.min(4, bw / 2, yb - yt);
+      svg += `<path pointer-events="none" fill="var(--primary)" d="M${x0},${yb} V${yt + r} Q${x0},${yt} ${x0 + r},${yt} H${x1 - r} Q${x1},${yt} ${x1},${yt + r} V${yb} Z"/>`;
+    } else if (segnaZeri) {
+      svg += `<rect pointer-events="none" x="${cx - bw / 2}" y="${y(0) - 3}" width="${bw}" height="3" rx="1.5" fill="var(--muted)"/>`;
+    }
+    if (i % ogni === (punti.length - 1) % ogni) {
+      svg += `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--muted)">${esc(p.etichetta)}</text>`;
+    }
+  });
+  el.innerHTML = svg + '</svg>';
+
+  const tip = $('tooltip');
+  const mostra = e => {
+    const r = e.target.closest('.hit');
+    if (!r) return;
+    el.querySelectorAll('.hit.attivo').forEach(h => h.classList.remove('attivo'));
+    r.classList.add('attivo');
+    tip.innerHTML = punti[+r.dataset.i].tip;
+    tip.hidden = false;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let left = e.clientX + 12, top = e.clientY - th - 12;
+    if (left + tw > window.innerWidth - 8) left = e.clientX - tw - 12;
+    if (top < 8) top = e.clientY + 16;
+    tip.style.left = Math.max(8, left) + 'px';
+    tip.style.top = top + 'px';
+  };
+  const nascondi = () => { tip.hidden = true; el.querySelectorAll('.hit.attivo').forEach(h => h.classList.remove('attivo')); };
+  const s = el.querySelector('svg');
+  s.addEventListener('pointermove', mostra);
+  s.addEventListener('pointerdown', mostra);
+  s.addEventListener('pointerleave', nascondi);
+}
+
+let timerResize;
+window.addEventListener('resize', () => {
+  clearTimeout(timerResize);
+  timerResize = setTimeout(() => { if (!$('sez-classifica').hidden) renderClassifiche(); }, 150);
+});
+document.addEventListener('scroll', () => { $('tooltip').hidden = true; }, { passive: true });
+
+/* ---------------- Studio ---------------- */
+const studio = { modo: 'elenco', mazzo: [], indice: 0, girata: false, svelate: new Set() };
+
+/** Frase d'esempio con la parola evidenziata. */
+function fraseEvidenziata(p) {
+  const m = trovaInFrase(p.esempio, p.inglese);
+  return m ? esc(p.esempio.slice(0, m.start)) + '<mark>' + esc(m.testo) + '</mark>' + esc(p.esempio.slice(m.end)) : esc(p.esempio);
+}
+
+/** Parole filtrate e ordinate secondo i controlli della pagina. */
+function paroleStudio() {
+  const q = normalizza($('studio-cerca').value);
+  const filtro = $('studio-filtro').value;
+  const ordine = $('studio-ordine').value;
+  return parole
+    .filter(p => !q || normalizza(p.inglese).includes(q) || normalizza(p.italiano).includes(q))
+    .filter(p => filtro === 'tutte' || (filtro === 'senzaImmagine' ? !immagini[p.id] : statoParola(p) === filtro))
+    .sort(ordine === 'errori' ? (a, b) => b.volteSbagliata - a.volteSbagliata || a.inglese.localeCompare(b.inglese)
+        : ordine === 'recenti' ? (a, b) => String(b.dataAggiunta).localeCompare(String(a.dataAggiunta))
+        : (a, b) => a.inglese.localeCompare(b.inglese));
+}
+
+function chipStato(p) {
+  const s = STATI.find(x => x.k === statoParola(p));
+  return `<span class="stato-chip" style="--c:${s.colore}" title="${s.desc}">${s.nome}</span>`;
+}
+
+function renderStudio() {
+  const bloccato = testInCorso();
+  $('studio-bloccato').hidden = !bloccato;
+  $('studio-contenuto').hidden = bloccato;
+  if (bloccato || $('sez-studio').hidden) return;
+
+  document.querySelectorAll('.seg-ctrl [data-modo]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modo === studio.modo)));
+  $('studio-nascondi-wrap').hidden = studio.modo !== 'elenco';
+  $('studio-fronte').hidden = studio.modo !== 'flash';
+  $('studio-elenco').hidden = studio.modo !== 'elenco';
+  $('studio-flash').hidden = studio.modo !== 'flash';
+
+  const lista = paroleStudio();
+  const conImg = parole.filter(p => immagini[p.id]).length;
+  $('studio-info').textContent = `${plurale(lista.length, 'parola', 'parole')} su ${parole.length} · ` +
+    `${plurale(conImg, 'immagine', 'immagini')} · spazio usato ≈ ${spazioUsatoMB().toFixed(1)} MB (il browser ne concede circa 5)`;
+
+  if (studio.modo === 'elenco') renderStudioElenco(lista);
+  else renderFlash(lista);
+}
+
+function renderStudioElenco(lista) {
+  const nascondi = $('studio-nascondi').checked;
+  if (!lista.length) { $('studio-elenco').innerHTML = '<div class="card hint">Nessuna parola con questi filtri.</div>'; return; }
+  $('studio-elenco').innerHTML = lista.map(p => {
+    const velata = nascondi && !studio.svelate.has(p.id);
+    return `<article class="sc">
+      ${immagini[p.id]
+        ? `<button type="button" class="sc-img" data-img="${p.id}" title="Cambia immagine"><img src="${immagini[p.id]}" alt="${esc(p.inglese)}" loading="lazy"></button>`
+        : `<button type="button" class="sc-img vuota" data-img="${p.id}">🖼️<span>Aggiungi immagine</span></button>`}
+      <div class="sc-body">
+        <div class="sc-top">${chipStato(p)}${voceOk ? `<button type="button" class="icon-btn" data-voce="${p.id}" title="Ascolta la pronuncia" aria-label="Ascolta ${esc(p.inglese)}">🔊</button>` : ''}</div>
+        <div class="sc-en" lang="en">${esc(p.inglese)}</div>
+        <div class="sc-it${velata ? ' velata' : ''}" data-svela="${p.id}" ${velata ? 'role="button" tabindex="0" title="Clicca per vedere la traduzione"' : ''}>${esc(p.italiano)}</div>
+        ${p.esempio ? `<div class="sc-ex" lang="en">${fraseEvidenziata(p)}</div>` : ''}
+        <div class="sc-st">Mostrata ${p.volteMostrata} · sbagliata ${p.volteSbagliata}</div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function renderFlash(lista) {
+  // Il mazzo segue i filtri; se cambiano si ricostruisce (mantenendo, se possibile, la carta corrente)
+  const ids = lista.map(p => p.id);
+  const stessoMazzo = studio.mazzo.length === ids.length && ids.every(id => studio.mazzo.includes(id));
+  if (!stessoMazzo) {
+    const corrente = studio.mazzo[studio.indice];
+    studio.mazzo = ids;
+    studio.indice = Math.max(0, ids.indexOf(corrente));
+    studio.girata = false;
+  }
+  if (!studio.mazzo.length) { $('studio-flash').innerHTML = '<div class="card hint">Nessuna parola con questi filtri.</div>'; return; }
+  studio.indice = Math.min(studio.indice, studio.mazzo.length - 1);
+  const p = parole.find(x => x.id === studio.mazzo[studio.indice]);
+  const fronteEn = $('studio-fronte').value === 'en';
+  const lato = (en) => en
+    ? `<div class="fl-en" lang="en">${esc(p.inglese)}</div>${p.esempio ? `<div class="fl-ex" lang="en">${fraseEvidenziata(p)}</div>` : ''}`
+    : `<div class="fl-it">${esc(p.italiano)}</div>`;
+  $('studio-flash').innerHTML = `
+    <div class="flash-top"><span>Carta <b>${studio.indice + 1}</b> / ${studio.mazzo.length}</span>${chipStato(p)}
+      <button type="button" class="btn sec small" id="fl-mescola">🔀 Mescola</button></div>
+    <div class="flash${studio.girata ? ' girata' : ''}" id="fl-carta" role="button" tabindex="0" aria-label="Gira la carta">
+      ${immagini[p.id] ? `<img src="${immagini[p.id]}" alt="">` : ''}
+      ${lato(fronteEn)}
+      <div class="fl-retro">${studio.girata ? lato(!fronteEn) : '<span class="hint">Tocca la carta o premi Spazio per girarla</span>'}</div>
+    </div>
+    <div class="row flash-nav">
+      <button type="button" class="btn sec" id="fl-prec">← Precedente</button>
+      ${voceOk ? `<button type="button" class="btn sec" id="fl-voce">🔊 Ascolta</button>` : ''}
+      <button type="button" class="btn sec" id="fl-img">🖼️ Immagine</button>
+      <button type="button" class="btn" id="fl-succ">Successiva →</button>
+    </div>
+    <p class="hint" style="text-align:center">Tastiera: <kbd>Spazio</kbd> gira la carta, <kbd>←</kbd> <kbd>→</kbd> scorrono.</p>`;
+  $('fl-carta').onclick = giraCarta;
+  $('fl-prec').onclick = () => scorriCarta(-1);
+  $('fl-succ').onclick = () => scorriCarta(1);
+  $('fl-img').onclick = () => apriImmagine(p.id);
+  if (voceOk) $('fl-voce').onclick = () => pronuncia(p.inglese);
+  $('fl-mescola').onclick = () => {
+    for (let i = studio.mazzo.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [studio.mazzo[i], studio.mazzo[j]] = [studio.mazzo[j], studio.mazzo[i]]; }
+    studio.indice = 0; studio.girata = false; renderStudio();
+  };
+}
+function giraCarta() { studio.girata = !studio.girata; renderStudio(); $('fl-carta').focus(); }
+function scorriCarta(d) {
+  if (!studio.mazzo.length) return;
+  studio.indice = (studio.indice + d + studio.mazzo.length) % studio.mazzo.length;
+  studio.girata = false;
+  renderStudio();
+}
+
+document.querySelectorAll('.seg-ctrl [data-modo]').forEach(b => b.addEventListener('click', () => { studio.modo = b.dataset.modo; renderStudio(); }));
+['studio-cerca', 'studio-filtro', 'studio-ordine', 'studio-fronte'].forEach(id => $(id).addEventListener('input', renderStudio));
+$('studio-nascondi').addEventListener('change', () => { studio.svelate.clear(); renderStudio(); });
+$('studio-torna-test').addEventListener('click', () => vaiA('test'));
+$('studio-elenco').addEventListener('click', e => {
+  const t = e.target.closest('[data-img],[data-voce],[data-svela]');
+  if (!t) return;
+  if (t.dataset.img) apriImmagine(t.dataset.img);
+  else if (t.dataset.voce) pronuncia(parole.find(p => p.id === t.dataset.voce).inglese);
+  else if (t.classList.contains('velata')) { studio.svelate.add(t.dataset.svela); t.classList.remove('velata'); t.removeAttribute('role'); t.removeAttribute('tabindex'); }
+});
+$('studio-elenco').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('velata')) { e.preventDefault(); e.target.click(); }
+});
+document.addEventListener('keydown', e => {
+  if ($('sez-studio').hidden || studio.modo !== 'flash' || $('dlg-img').open) return;
+  const t = e.target instanceof Element ? e.target : document.body;
+  if (t.closest('input, select, textarea') || e.ctrlKey || e.altKey || e.metaKey) return;
+  if ((e.key === ' ' || e.key === 'Enter') && t.closest('button, a')) return;   // lascia funzionare i pulsanti
+  if (e.key === ' ' || (e.key === 'Enter' && t.id === 'fl-carta')) { e.preventDefault(); giraCarta(); }
+  else if (e.key === 'ArrowRight') scorriCarta(1);
+  else if (e.key === 'ArrowLeft') scorriCarta(-1);
+});
+
+/* ---------------- Pronuncia (sintesi vocale del browser, funziona offline) ---------------- */
+const voceOk = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function pronuncia(testo) {
+  if (!voceOk) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(testo);
+  const voci = speechSynthesis.getVoices();
+  u.voice = voci.find(v => /^en[-_]GB/i.test(v.lang)) || voci.find(v => /^en[-_]US/i.test(v.lang)) || voci.find(v => /^en/i.test(v.lang)) || null;
+  u.lang = u.voice ? u.voice.lang : 'en-GB';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+/* ---------------- Immagini delle parole ---------------- */
+const IMG_LATO_MAX = 320;   // px: le immagini vengono rimpicciolite per occupare poco spazio
+let imgParolaId = null;
+
+function apriImmagine(id) {
+  const p = parole.find(x => x.id === id);
+  if (!p) return;
+  imgParolaId = id;
+  $('dlg-titolo').textContent = `Immagine per «${p.inglese}»`;
+  $('dlg-cerca').href = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(p.inglese);
+  $('dlg-msg').innerHTML = '';
+  aggiornaAnteprima();
+  $('dlg-img').showModal();
+  $('dlg-drop').focus();
+}
+function aggiornaAnteprima() {
+  const url = immagini[imgParolaId];
+  $('dlg-drop').innerHTML = url
+    ? `<img src="${url}" alt="Immagine attuale">`
+    : '<div class="dlg-vuoto">📋 Incolla qui con <b>Ctrl+V</b><br>o trascina un\'immagine</div>';
+  $('dlg-rimuovi').hidden = !url;
+}
+
+/** Rimpicciolisce l'immagine e la converte in WebP (o JPEG se il browser non sa creare WebP). */
+function comprimiImmagine(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scala = Math.min(1, IMG_LATO_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.naturalWidth * scala));
+      c.height = Math.max(1, Math.round(img.naturalHeight * scala));
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);   // sfondo bianco per le immagini trasparenti
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      let out = c.toDataURL('image/webp', 0.72);
+      if (!out.startsWith('data:image/webp')) out = c.toDataURL('image/jpeg', 0.78);
+      resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('immagine non leggibile')); };
+    img.src = url;
+  });
+}
+
+async function impostaImmagine(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    mostraMsg('dlg-msg', 'Questo non è un\'immagine. Su Google usa "Copia immagine" (non "Copia indirizzo immagine").', 'warn', 8000);
+    return;
+  }
+  try {
+    const precedente = immagini[imgParolaId];
+    immagini[imgParolaId] = await comprimiImmagine(file);
+    if (!salvaImmagini()) {
+      if (precedente) immagini[imgParolaId] = precedente; else delete immagini[imgParolaId];
+      mostraMsg('dlg-msg', 'Spazio del browser esaurito: rimuovi qualche immagine (filtro "Senza immagine" per vedere le altre) oppure esporta un backup.', 'err', 12000);
+      return;
+    }
+    aggiornaAnteprima();
+    mostraMsg('dlg-msg', `Immagine salvata (${Math.round(immagini[imgParolaId].length / 1024)} KB).`, 'ok');
+    renderLista(); renderStudio();
+  } catch (e) {
+    mostraMsg('dlg-msg', 'Non riesco a leggere questa immagine: prova con un\'altra o salvala e caricala dal dispositivo.', 'err', 8000);
+  }
+}
+
+$('dlg-carica').addEventListener('click', () => $('dlg-file').click());
+$('dlg-file').addEventListener('change', e => { impostaImmagine(e.target.files[0]); e.target.value = ''; });
+$('dlg-rimuovi').addEventListener('click', () => {
+  delete immagini[imgParolaId];
+  salvaImmagini();
+  aggiornaAnteprima();
+  mostraMsg('dlg-msg', 'Immagine rimossa.', 'info');
+  renderLista(); renderStudio();
+});
+document.addEventListener('paste', e => {
+  if (!$('dlg-img').open) return;
+  const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith('image/'));
+  e.preventDefault();
+  if (item) impostaImmagine(item.getAsFile());
+  else mostraMsg('dlg-msg', 'Negli appunti non c\'è un\'immagine. Su Google: clic destro sull\'immagine → "Copia immagine".', 'warn', 8000);
+});
+const drop = $('dlg-drop');
+['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('sopra'); }));
+['dragleave', 'drop'].forEach(t => drop.addEventListener(t, () => drop.classList.remove('sopra')));
+drop.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = [...e.dataTransfer.files].find(f => f.type.startsWith('image/'));
+  if (file) impostaImmagine(file);
+  else mostraMsg('dlg-msg', 'Da una pagina web è meglio copiare e incollare: clic destro → "Copia immagine", poi Ctrl+V qui.', 'warn', 8000);
+});
+
+/* ---------------- Avvio ---------------- */
+carica();
+aggiornaHintEsempio();
+renderLista();
+renderClassifiche();
+renderTest();
+$('f-inglese').focus();
+</script>
+</body>
+</html>
