@@ -22,7 +22,10 @@ I wanted a tool that adapts to my mistakes instead of repeating the same list, a
 Each test is built in three lanes: a few never-seen words (oldest first), a few words that have not appeared for the longest time, and the rest drawn by weighted random sampling among words still "to review". The weight grows with the number of mistakes and decays with consecutive correct answers. Parameters are in one `CONFIG` object at the top of the code.
 
 ## Tech
-HTML, CSS, vanilla JavaScript, localStorage, Web Speech API, hand-drawn SVG charts. The core logic is written as pure functions, separate from the interface, so it can be tested on its own.
+HTML, CSS, vanilla JavaScript, localStorage, Web Speech API, hand-drawn SVG charts. The core logic is written as pure functions, separate from the interface, which keeps it easy to test in isolation.
+
+## How I built it
+I designed the product myself: the learning method, the three-lane word selection, the scoring rules and the progress path. I built the app with the help of an AI assistant (Claude, by Anthropic), which wrote the code from my specifications. My role was to define what the app had to do, decide how it should behave, review the result and test it on my own daily study.
 
 ## What I learned
 - Designing a selection algorithm that balances novelty, review and difficulty
